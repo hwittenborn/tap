@@ -15,3 +15,4 @@ At the time of writing, tap contains the following features:
 tap can be installed [directly from the MPR](https://dur.hunterwittenborn.com/packages/tap).
 
 Help with available commands can also be found after installation with `tap --help`.
+ 
