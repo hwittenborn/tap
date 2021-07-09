@@ -1,7 +1,7 @@
 <h1 align="center">tap</h2>
 
 ## Overview
-tap is a second-generation MPR helper, being the predecessor to [mpm](https://github.com/hwittenborn/mpm), and providing numerous benefits, with the biggest one being performance improvements.
+tap is a second-generation MPR helper, being the successor to [mpm](https://github.com/hwittenborn/mpm), and providing numerous benefits, with the biggest one being performance improvements.
 
 tap is currently in very early development, and will thus be very behind on features.
 
