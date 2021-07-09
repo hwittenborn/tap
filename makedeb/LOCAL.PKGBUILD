@@ -13,7 +13,7 @@ source=("git+file://${_gitdir}")
 sha256sums=('SKIP')
 
 package() {
-	# Create file for tap
+	# Create executable for tap
 	mkdir -p "${pkgdir}/usr/bin/"
 	echo '#!/usr/bin/env python3' > "${pkgdir}/usr/bin/tap"
 
