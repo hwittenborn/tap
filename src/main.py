@@ -10,6 +10,7 @@ from functions.help_menu import help_menu                # REMOVE AT PACKAGING
 from functions.install_package import install_package    # REMOVE AT PACKAGING
 from functions.update_package import update_package      # REMOVE AT PACKAGING
 from functions.search_package import search_package      # REMOVE AT PACKAGING
+from functions.root_check import root_check              # REMOVE AT PACKAGING
 
 # Variables we need to function
 application_name = "tap"
@@ -33,9 +34,11 @@ if argument_value == "-h" or argument_value == "--help":
 	quit(0)
 
 elif argument_value == "install":
+	root_check()
 	operation = "install"
 
 elif argument_value == "update" or argument_value == "upgrade":
+	root_check()
 	operation = "update"
 
 elif argument_value == "search":
