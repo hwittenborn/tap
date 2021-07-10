@@ -8,7 +8,7 @@ depends=('python3')
 license=('GPL3')
 url="https://github.com/hwittenborn/tap"
 
-source=("${url}/archive/refs/tags/v0.1.tar.gz")
+source=("${url}/archive/refs/tags/v${pkgver}.tar.gz")
 sha256sums=('SKIP')
 
 package() {
