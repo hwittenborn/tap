@@ -5,9 +5,10 @@ import os
 import sys
 import re
 
-from functions.arg_check import arg_check              # REMOVE AT PACKAGING
-from functions.help_menu import help_menu              # REMOVE AT PACKAGING
-from functions.search_package import search_package    # REMOVE AT PACKAGING
+from functions.arg_check import arg_check                # REMOVE AT PACKAGING
+from functions.help_menu import help_menu                # REMOVE AT PACKAGING
+from functions.install_package import install_package    # REMOVE AT PACKAGING
+from functions.search_package import search_package      # REMOVE AT PACKAGING
 
 # Variables we need to function
 application_name = "tap"
@@ -31,7 +32,7 @@ if argument_value == "-h" or argument_value == "--help":
 	quit(0)
 
 elif argument_value == "install":
-	operation = "clone"
+	operation = "install"
 
 elif argument_value == "update" or argument_value == "upgrade":
 	operation = "update"
@@ -83,5 +84,8 @@ elif (operation == "install" or operation == "search" or operation == "clone" ) 
 packages = sorted(list(set(packages_temp)))
 
 # Run commands
-if operation == "search":
+if operation == "install":
+	install_package(dur_url, packages)
+
+elif operation == "search":
 	search_package(dur_url, packages)
