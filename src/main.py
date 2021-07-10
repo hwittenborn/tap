@@ -8,6 +8,7 @@ import re
 from functions.arg_check import arg_check                # REMOVE AT PACKAGING
 from functions.help_menu import help_menu                # REMOVE AT PACKAGING
 from functions.install_package import install_package    # REMOVE AT PACKAGING
+from functions.update_package import update_package      # REMOVE AT PACKAGING
 from functions.search_package import search_package      # REMOVE AT PACKAGING
 
 # Variables we need to function
@@ -81,11 +82,14 @@ elif (operation == "install" or operation == "search" or operation == "clone" ) 
 	print("No package was specified.")
 	quit(1)
 
-packages = sorted(list(set(packages_temp)))
+packages = sorted(packages_temp)
 
 # Run commands
 if operation == "install":
-	install_package(dur_url, packages)
+	install_package(dur_url, packages, "installed")
+
+elif operation == "update":
+	update_package(dur_url)
 
 elif operation == "search":
 	search_package(dur_url, packages)

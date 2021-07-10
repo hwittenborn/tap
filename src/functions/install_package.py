@@ -1,4 +1,4 @@
-def install_package(dur_url, packages):
+def install_package(dur_url, packages, operation_string):
 	import requests
 	import json
 	import re
@@ -124,11 +124,11 @@ def install_package(dur_url, packages):
 	if len(apt_needed_dependencies) > 1:
 		print("The following dependencies are going to be installed:")
 		print(f"  {apt_needed_dependencies}")
-		print("The following packages are going to be built:")
+		print(f"The following packages are going to be built and {operation_string}:")
 		print(f" {package_text}")
 
 	else:
-		print("The following packages are going to be built and installed:")
+		print(f"The following packages are going to be built and {operation_string}:")
 		print(f" {package_text}")
 
 	print()
