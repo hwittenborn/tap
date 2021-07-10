@@ -28,6 +28,9 @@ package() {
 	# Remove testing commands
 	sed -i 's|.*# REMOVE AT PACKAGING||' "${pkgdir}/usr/bin/tap"
 
+	# Set package version
+	sed -i "s|application_version =.*|application_version = '${pkgver}-${pkgrel}'|" "${pkgdir}/usr/bin/tap"
+
 	# Set perms on executable
 	chmod 555 "${pkgdir}/usr/bin/tap"
 }
