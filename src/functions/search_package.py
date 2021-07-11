@@ -10,7 +10,7 @@ def search_package(dur_url, packages):
 	for i in packages:
 		request_arguments += i
 
-	dur_rpc_request = requests.get("https://" + dur_url + "/rpc/?v=5&type=search&arg=" + request_arguments)
+	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=search&arg={request_arguments}")
 
 	try: dur_rpc_json_data = json.loads(dur_rpc_request.text)
 	except json.decoder.JSONDecodeError:

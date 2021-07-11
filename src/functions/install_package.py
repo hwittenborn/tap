@@ -15,7 +15,7 @@ def install_package(dur_url, packages, operation_string):
 	for i in packages:
 		rpc_request_arguments += "&arg[]=" + i
 
-	dur_rpc_request = requests.get("https://" + dur_url + "/rpc/?v=5&type=info" + rpc_request_arguments)
+	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=info{rpc_request_arguments}")
 
 	# Make sure returned JSON is valid
 	try: dur_rpc_json_data = json.loads(dur_rpc_request.text)
