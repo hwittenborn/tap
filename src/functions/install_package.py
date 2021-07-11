@@ -209,10 +209,10 @@ def install_package(dur_url, packages, operation_string):
 		mpr_control_fields = os.popen('/usr/bin/env bash -c \'source PKGBUILD; echo "${control_fields}" | sed "s| |\\n|g" | grep "^MPR-Package:"\'').read()
 
 		if len(mpr_control_fields) > 0:
-			makedeb_exit_code = os.system("makedeb")
+			makedeb_exit_code = os.system("makedeb -v")
 
 		else:
-		 	makedeb_exit_code = os.system("makedeb -H 'MPR-Package: True'")
+		 	makedeb_exit_code = os.system("makedeb -vH 'MPR-Package: True'")
 
 		if makedeb_exit_code != 0:
 		 	print(f"There was an issue building package '{i}'. Aborting...")
