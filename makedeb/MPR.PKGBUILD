@@ -1,6 +1,6 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=tap
-pkgver=0.7.0
+pkgver=0.8.0
 pkgrel=1
 pkgdesc="MPR in your pocket"
 arch=('any')
