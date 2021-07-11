@@ -231,7 +231,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		package_relationship = get_srcinfo_value('pkgrel')[0]
 
 		# Get system architecture
-		system_architecture = os.popen("dpkg --print-architecture").read().replace('\\n', '')
+		system_architecture = os.popen("dpkg --print-architecture").read().strip()
 
 		# Get built package names
 		package_names = get_srcinfo_value('pkgname')
