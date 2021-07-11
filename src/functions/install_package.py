@@ -138,6 +138,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		print("Quitting...")
 		quit(1)
 
+	print()
+
 	if os.path.exists('/var/tmp/mpm/'):
 
 		if os.access('/var/tmp/mpm/', os.W_OK) == False:
