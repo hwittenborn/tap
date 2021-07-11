@@ -15,7 +15,7 @@ from functions.root_check import root_check              # REMOVE AT PACKAGING
 # Variables we need to function
 application_name = "tap"
 application_version = "git"
-dur_url = "dur.hunterwittenborn.com"
+mpr_url = "mpr.hunterwittenborn.com"
 
 # Argument check
 if len(sys.argv) == 1:
@@ -89,10 +89,10 @@ packages = sorted(packages_temp)
 
 # Run commands
 if operation == "install":
-	install_package(dur_url, packages, "installed", application_name, application_version)
+	install_package(mpr_url, packages, "installed", application_name, application_version)
 
 elif operation == "update":
-	update_package(dur_url, application_name, application_version)
+	update_package(mpr_url, application_name, application_version)
 
 elif operation == "search":
-	search_package(dur_url, packages, application_name, application_version)
+	search_package(mpr_url, packages, application_name, application_version)

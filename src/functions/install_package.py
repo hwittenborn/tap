@@ -1,4 +1,4 @@
-def install_package(dur_url, packages, operation_string, application_name, application_version):
+def install_package(mpr_url, packages, operation_string, application_name, application_version):
 	import requests
 	import json
 	import re
@@ -15,23 +15,23 @@ def install_package(dur_url, packages, operation_string, application_name, appli
 	for i in packages:
 		rpc_request_arguments += "&arg[]=" + i
 
-	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
+	mpr_rpc_request = requests.get(f"https://{mpr_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
 
 	# Make sure returned JSON is valid
-	try: dur_rpc_json_data = json.loads(dur_rpc_request.text)
+	try: mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
 	except json.decoder.JSONDecodeError:
 		print("[JSON] There was an error processing your request.")
 		quit(1)
 
 	# Used throughout the rest of the script
-	resultcount = dur_rpc_json_data['resultcount']
+	resultcount = mpr_rpc_json_data['resultcount']
 
 	number = 0
 	package_names = []
 
 	# Get package names
 	while number < resultcount:
-		package_names += [dur_rpc_json_data['results'][number]['Name']]
+		package_names += [mpr_rpc_json_data['results'][number]['Name']]
 		number = number + 1
 
 	# Check if any packages couldn't be found
@@ -58,7 +58,7 @@ def install_package(dur_url, packages, operation_string, application_name, appli
 	while number < resultcount:
 		for i in ['Depends', 'Makedepends', 'Checkdepends']:
 
-			try: dependencies_temp += dur_rpc_json_data['results'][number][i]
+			try: dependencies_temp += mpr_rpc_json_data['results'][number][i]
 			except KeyError:
 				continue
 
@@ -157,7 +157,7 @@ def install_package(dur_url, packages, operation_string, application_name, appli
 	failed_packages = " "
 
 	for i in packages:
-		git_status = os.system(f"git clone 'https://{dur_url}/{i}.git' > /dev/null 2>&1")
+		git_status = os.system(f"git clone 'https://{mpr_url}/{i}.git' > /dev/null 2>&1")
 
 		if git_status != 0:
 			failed_packages += f" {i}"

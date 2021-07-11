@@ -1,4 +1,4 @@
-def update_package(dur_url, application_name, application_version):
+def update_package(mpr_url, application_name, application_version):
 	import os
 	import json
 	import requests
@@ -21,28 +21,28 @@ def update_package(dur_url, application_name, application_version):
 	for i in request_packages:
 		rpc_request_arguments += "&arg[]=" + i.split('/')[0]
 
-	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
+	mpr_rpc_request = requests.get(f"https://{mpr_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
 
 	try:
-		dur_rpc_json_data = json.loads(dur_rpc_request.text)
+		mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
 
 	except json.decoder.JSONDecodeError:
 		print("[JSON] There was an error processing your request.")
 		quit(1)
 
-	if dur_rpc_json_data['resultcount'] == 0:
+	if mpr_rpc_json_data['resultcount'] == 0:
 		printf("No updates available.")
 		quit(1)
 
 	# Check for updates
-	resultcount = dur_rpc_json_data['resultcount'] - 1
+	resultcount = mpr_rpc_json_data['resultcount'] - 1
 	number = 0
 	to_update = []
 
 	while number <= resultcount:
 		# Get name and version
-		rpc_package_name = dur_rpc_json_data['results'][number]['Name']
-		rpc_package_version = dur_rpc_json_data['results'][number]['Version']
+		rpc_package_name = mpr_rpc_json_data['results'][number]['Name']
+		rpc_package_version = mpr_rpc_json_data['results'][number]['Version']
 
 		# Find array number for matching local package
 		number2 = 0
@@ -65,4 +65,4 @@ def update_package(dur_url, application_name, application_version):
 		print("No updates available.")
 		quit(0)
 
-	install_package(dur_url, to_update, "upgraded", application_name, application_version)
+	install_package(mpr_url, to_update, "upgraded", application_name, application_version)

@@ -11,20 +11,20 @@ rm -rf '/root/.ssh/' || true
 mkdir -p '/root/.ssh/'
 
 echo "${known_hosts}" > '/root/.ssh/known_hosts'
-echo "${ssh_key}" > '/root/.ssh/DUR'
+echo "${ssh_key}" > '/root/.ssh/MPR'
 
-chmod 400 /root/.ssh/DUR /root/.ssh/known_hosts
+chmod 400 /root/.ssh/MPR /root/.ssh/known_hosts
 
-printf "Host ${dur_url}\n  Hostname ${dur_url}\n  IdentityFile /root/.ssh/DUR\n" | tee /root/.ssh/config
+printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile /root/.ssh/MPR\n" | tee /root/.ssh/config
 
 # Git Shit
 git config --global user.name "Kavplex Bot"
 git config --global user.email "kavplex@hunterwittenborn.com"
 
-git clone "ssh://dur@${dur_url}/tap.git" "tap-mpr"
+git clone "ssh://mpr@${mpr_url}/tap.git" "tap-mpr"
 
 rm "tap-mpr/PKGBUILD"
-cp "makedeb/DUR.PKGBUILD" "tap-mpr/PKGBUILD"
+cp "makedeb/MPR.PKGBUILD" "tap-mpr/PKGBUILD"
 
 chown user:user "tap-mpr" -R
 
