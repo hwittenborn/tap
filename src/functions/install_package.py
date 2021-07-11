@@ -8,6 +8,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import time
 
 	from functions.get_srcinfo_value import get_srcinfo_value    # REMOVE AT PACKAGING
+	from functions.dependency_checks import dependency_checks    # REMOVE AT PACKAGING
 
 	# Make request to MPR
 	rpc_request_arguments = ""
@@ -98,18 +99,19 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	print('Checking dependencies...')
 
-	apt_output = os.popen(f"eval echo apt-get satisfy -sq {apt_package_arguments} 2>&1").read()
+	apt_output = os.popen(f"eval apt-get satisfy -sq {apt_package_arguments} 2>&1").read()
 
 	# Check for any dependencies that cannot be installed
-	try:
-		apt_bad_dependencies = re.search('Depends: .*', apt_output).group(0).replace('Depends: ', '').replace(' but it is not installable', '')
+	apt_bad_dependency_strings = re.search('Depends: .*', apt_output)
 
+	if apt_bad_dependency_strings != None:
+		# Removes 'Depends: ' and ' but it is not installable' from list of uninstallable packages
+		apt_bad_dependencies = apt_bad_dependency_strings.group(0).replace('Depends: ', '').replace(' but it is not installable', '')
+
+		print()
 		print("The following dependencies are unable to be installed:")
 		print(f"  {apt_bad_dependencies}")
 		quit(1)
-
-	except:
-		pass
 
 	# Get dependencies that need to be installed
 	apt_needed_dependencies = os.popen(f"echo \"{apt_output}\" | sed 's|$| |g' | tr -d '\n' | grep -o 'The following NEW packages.*not upgraded.' | sed 's|The following NEW packages will be installed:||' | sed 's|[[:digit:]] upgraded.*||' | xargs").read()
@@ -180,9 +182,15 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		while confirm_status != 'n' and confirm_status != 'N':
 
+			# Run nano on the PKGBUILD before checking for other files,
+			# as we want the PKGBUILD to *always* be the first file to open
+			os.system("nano PKGBUILD")
+
 			for j in pathlib.Path("./").glob('**/*'):
 
-				if bool(re.match('^\.git/', str(j))) == False and os.path.isfile(j) == True and bool(str(j) != '.SRCINFO') == True:
+				# Look at all files, excluding 'PKGBUILD', '.SRCINFO', and
+				# everything in the '.git' folder
+				if str(j) != 'PKGBUILD' and str(j) != '.SRCINFO' and bool(re.match('^\.git/', str(j))) == False and os.path.isfile(j) == True:
 					os.system(f"nano '{j}'")
 
 			time.sleep(1)
