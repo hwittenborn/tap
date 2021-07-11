@@ -1,4 +1,4 @@
-def update_package(dur_url):
+def update_package(dur_url, application_name, application_version):
 	import os
 	import json
 	import requests
@@ -21,7 +21,7 @@ def update_package(dur_url):
 	for i in request_packages:
 		rpc_request_arguments += "&arg[]=" + i.split('/')[0]
 
-	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=info{rpc_request_arguments}")
+	dur_rpc_request = requests.get(f"https://{dur_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
 
 	try:
 		dur_rpc_json_data = json.loads(dur_rpc_request.text)
@@ -65,4 +65,4 @@ def update_package(dur_url):
 		print("No updates available.")
 		quit(0)
 
-	install_package(dur_url, to_update, "upgraded")
+	install_package(dur_url, to_update, "upgraded", application_name, application_version)

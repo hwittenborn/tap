@@ -89,10 +89,10 @@ packages = sorted(packages_temp)
 
 # Run commands
 if operation == "install":
-	install_package(dur_url, packages, "installed")
+	install_package(dur_url, packages, "installed", application_name, application_version)
 
 elif operation == "update":
-	update_package(dur_url)
+	update_package(dur_url, application_name, application_version)
 
 elif operation == "search":
-	search_package(dur_url, packages)
+	search_package(dur_url, packages, application_name, application_version)
