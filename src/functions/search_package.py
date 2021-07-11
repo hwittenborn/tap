@@ -3,6 +3,8 @@ def search_package(dur_url, packages):
 	import json
 	import datetime
 
+	from functions.colors import colors    # REMOVE AT PACKAGING
+
 	request_arguments = ""
 
 	for i in packages:
@@ -23,19 +25,19 @@ def search_package(dur_url, packages):
 
 	while number < dur_rpc_json_data["resultcount"]:
 
-		print(dur_rpc_json_data['results'][number]['Name'] + '/' + dur_rpc_json_data['results'][number]['Version'])
-		print("  Description: " + dur_rpc_json_data['results'][number]['Description'])
-		print("  Maintainer: " + dur_rpc_json_data['results'][number]['Maintainer'])
-		print("  Votes: " + str(dur_rpc_json_data['results'][number]['NumVotes']))
+		print(f"{colors.apt_green}{dur_rpc_json_data['results'][number]['Name']}{colors.white}/{dur_rpc_json_data['results'][number]['Version']}")
+		print(f"  Description: {dur_rpc_json_data['results'][number]['Description']}")
+		print(f"  Maintainer: {dur_rpc_json_data['results'][number]['Maintainer']}")
+		print(f"  Votes: {str(dur_rpc_json_data['results'][number]['NumVotes'])}")
 
 		outofdate = dur_rpc_json_data['results'][number]['OutOfDate']
 		if outofdate == None:
 			print("  Out of Date: N/A")
 		else:
-			print("  Out of Date: " + datetime.datetime.fromtimestamp(outofdate).strftime('%Y-%m-%d'))
+			print(f"  Out of Date: {datetime.datetime.fromtimestamp(outofdate).strftime('%Y-%m-%d')}")
 
 		lastmodified = dur_rpc_json_data['results'][number]['LastModified']
-		print('  Last Modified: ' + datetime.datetime.fromtimestamp(lastmodified).strftime('%Y-%m-%d'))
+		print(f"  Last Modified: {datetime.datetime.fromtimestamp(lastmodified).strftime('%Y-%m-%d')}")
 
 		if (number + 1) < dur_rpc_json_data["resultcount"]:
 			print()
