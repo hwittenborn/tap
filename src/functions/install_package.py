@@ -1,3 +1,6 @@
+from os import environ
+
+
 def install_package(mpr_url, packages, operation_string, application_name, application_version):
 	import requests
 	import json
@@ -8,6 +11,9 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import time
 
 	from functions.get_srcinfo_value import get_srcinfo_value    # REMOVE AT PACKAGING
+
+	# Choose an editor command accordin to user's preferences
+	editor = os.environ.get('VISUAL', os.environ.get('EDITOR', '/usr/bin/editor'))
 
 	# Make request to MPR
 	rpc_request_arguments = ""
@@ -183,7 +189,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			for j in pathlib.Path("./").glob('**/*'):
 
 				if bool(re.match('^\.git/', str(j))) == False and os.path.isfile(j) == True and bool(str(j) != '.SRCINFO') == True:
-					os.system(f"nano '{j}'")
+					os.system(f"{editor} '{j}'")
 
 			time.sleep(1)
 
