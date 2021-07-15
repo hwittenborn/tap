@@ -12,8 +12,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	from functions.get_srcinfo_value import get_srcinfo_value    # REMOVE AT PACKAGING
 
-	# Choose an editor command accordin to user's preferences
-	editor = os.environ.get('VISUAL', os.environ.get('EDITOR', '/usr/bin/editor'))
+	# Choose an editor command according to user's preferences
+	editor = environ.get('VISUAL', environ.get('EDITOR', '/usr/bin/editor'))
 
 	# Make request to MPR
 	rpc_request_arguments = ""
