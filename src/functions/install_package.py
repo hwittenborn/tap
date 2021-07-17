@@ -188,7 +188,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	if len(apt_needed_dependencies) > 1:
 		print("Installing build dependencies...")
-		apt_install_dependencies_exit_code = os.system(f"eval sudo apt-get satisfy {apt_package_arguments}")
+		apt_install_dependencies_exit_code = os.system(f"eval sudo apt-get satisfy {apt_dependency_package_arguments}")
 
 		if apt_install_dependencies_exit_code != 0:
 			print("There was an error installing build dependencies.")
