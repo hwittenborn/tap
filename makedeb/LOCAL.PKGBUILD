@@ -1,9 +1,9 @@
 # Maintainer: Hunter Wittenborn
 
 # This PKGBUILD is used for local testing of tap. Variables are sourced
-# from the DUR PKGBUILD, and then addition development variables and
+# from the MPR PKGBUILD, and then addition development variables and
 # functions are applied.
-source DUR.PKGBUILD
+source MPR.PKGBUILD
 
 # Get local path info
 _gitdir="$(git rev-parse --show-toplevel)"
