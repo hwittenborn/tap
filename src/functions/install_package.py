@@ -7,8 +7,13 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import pathlib
 	import time
 
-	from functions.get_srcinfo_value import get_srcinfo_value    # REMOVE AT PACKAGING
-	from functions.dependency_checks import dependency_checks    # REMOVE AT PACKAGING
+	from functions.get_srcinfo_value                        import  get_srcinfo_value                # REMOVE AT PACKAGING
+	from functions.install_pkg.dependency_checks            import  dependency_checks                # REMOVE AT PACKAGING
+
+	from functions.install_pkg.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
+	from functions.install_pkg.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
+	from functions.install_pkg.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
+
 
 	# Make request to MPR
 	rpc_request_arguments = ""
@@ -35,7 +40,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		package_names += [mpr_rpc_json_data['results'][number]['Name']]
 		number = number + 1
 
-	# Check if any packages couldn't be found
+	# Check if any packages cannot be found
 	bad_packages = ""
 
 	for i in packages:
@@ -57,81 +62,63 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	number = 0
 	while number < resultcount:
-		for i in ['Depends', 'Makedepends', 'Checkdepends']:
+		for i in ['Depends', 'MakeDepends', 'CheckDepends']:
 
-			try: dependencies_temp += mpr_rpc_json_data['results'][number][i]
+			try:
+				dependencies_temp += mpr_rpc_json_data['results'][number][i]
 			except KeyError:
 				continue
 
 		number = number + 1
 
-	dependencies = sorted(list(set(dependencies_temp)))
+	dependencies = sorted(dependencies_temp)
 
 	# Format dependencies for APT
-	apt_package_arguments_temp = []
-	for i in dependencies:
+	apt_dependency_list = format_dependencies(dependencies)
 
-		for j in ['<=', '>=', '<', '>', '=']:
+	# Generate argument list for 'apt-get satisfy'
+	apt_dependency_package_arguments = ""
 
-			try:
-				relationship_type = re.search(j, i).group(0)
-				break
-
-			except AttributeError:
-				if j == '=':
-					# Needs to be set to a relationship (even when non is found)
-					# for the regex check on 'package_version' below.
-					relationship_type = "="
-				continue
-
-		try:
-			dependency_name = re.search(f"^.*{relationship_type}", i).group(0).replace(relationship_type, '')
-			dependency_version = re.search(f"{relationship_type}.*$", i).group(0).replace(relationship_type, '')
-
-			apt_package_arguments_temp += [f"\\''{dependency_name} ({relationship_type} {dependency_version})'\\'"]
-
-		except AttributeError:
-			apt_package_arguments_temp += [f"\\''{i}'\\'"]
-
-	apt_package_arguments = ""
-	for i in apt_package_arguments_temp:
-		apt_package_arguments += f" {i}"
+	for i in apt_dependency_list:
+		apt_dependency_package_arguments += f" \\''{i}'\\'"
 
 	print('Checking dependencies...')
 
-	apt_output = os.popen(f"eval apt-get satisfy -sq {apt_package_arguments} 2>&1").read()
+	# Get raw output from apt-get
+	apt_raw_output = os.popen(f"eval apt-get satisfy -sq {apt_dependency_package_arguments} 2>&1").read()
 
-	# Check for any dependencies that cannot be installed
-	apt_bad_dependency_strings = re.search('Depends: .*', apt_output)
+	# Process previous output to figure out what we need to do
+	apt_needed_dependencies = get_dependency_packages(apt_raw_output, 'The following NEW packages will be installed')
+	apt_removal_dependencies = get_dependency_packages(apt_raw_output, 'The following packages will be REMOVED')
 
-	if apt_bad_dependency_strings != None:
-		# Removes 'Depends: ' and ' but it is not installable' from list of uninstallable packages
-		apt_bad_dependencies = apt_bad_dependency_strings.group(0).replace('Depends: ', '').replace(' but it is not installable', '')
+	# Quit if bad dependencies were found
+	bad_apt_dependencies = process_bad_apt_dependencies(apt_raw_output)
+
+	if bad_apt_dependencies != "":
 
 		print()
-		print("The following dependencies are unable to be installed:")
-		print(f"  {apt_bad_dependencies}")
-		quit(1)
-
-	# Get dependencies that need to be installed
-	apt_needed_dependencies = os.popen(f"echo \"{apt_output}\" | sed 's|$| |g' | tr -d '\n' | grep -o 'The following NEW packages.*not upgraded.' | sed 's|The following NEW packages will be installed:||' | sed 's|[[:digit:]] upgraded.*||' | xargs").read()
-
-	package_text = " "
-	for i in packages:
-		package_text += f" {i}"
-
-	print()
+		print("The following packages have unmet dependencies:")
+		print(f"  {bad_apt_dependencies}")
+		quit()
 
 	# Go over what'll be installed
-	if len(apt_needed_dependencies) > 1:
+	apt_package_text = ""
+	for i in packages:
+		apt_package_text += f" {i}"
+
+	if apt_removal_dependencies != "":
+		print()
+		print('The following packages are going to be REMOVED:')
+		print(f"  {apt_removal_dependencies}")
+
+	if apt_needed_dependencies != "":
+		print()
 		print("The following dependencies are going to be installed:")
 		print(f"  {apt_needed_dependencies}")
-		print(f"The following packages are going to be built and {operation_string}:")
-		print(f" {package_text}")
 
-	else:
-		print(f"The following packages are going to be built and {operation_string}:")
-		print(f" {package_text}")
+	print()
+	print(f"The following packages are going to be built and {operation_string}:")
+	print(f" {apt_package_text}")
 
 	print()
 	continue_status = input("Would you like to continue? [Y/n] ")
