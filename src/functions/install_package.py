@@ -3,17 +3,23 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import json
 	import re
 	import os
+	import subprocess
 	import shutil
 	import pathlib
 	import time
 
-	from functions.get_srcinfo_value                        import  get_srcinfo_value                # REMOVE AT PACKAGING
-	from functions.install_pkg.dependency_checks            import  dependency_checks                # REMOVE AT PACKAGING
+	from functions.get_srcinfo_value                         import  get_srcinfo_value               # REMOVE AT PACKAGING
+	from functions.install_pkg.dependency_checks             import  dependency_checks               # REMOVE AT PACKAGING
+	from functions.install_pkg.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
 
 	from functions.install_pkg.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
 	from functions.install_pkg.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
 	from functions.install_pkg.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
 
+	# This is used a bit below to get the editor required to look over build files.
+	# We run this now in case an editor is specified, but it cannot be found
+	# on the system (we would thus quit now, instead of when looking over the build files).
+	editor_name = get_editor_name()
 
 	# Make request to MPR
 	rpc_request_arguments = ""
@@ -169,16 +175,24 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		while confirm_status != 'n' and confirm_status != 'N':
 
-			# Run nano on the PKGBUILD before checking for other files,
+			# Look over the PKGBUILD before checking for other files,
 			# as we want the PKGBUILD to *always* be the first file to open
-			os.system("nano PKGBUILD")
+			exit_code = subprocess.call(f"'{editor_name}' PKGBUILD", shell=True)
+
+			if exit_code != 0:
+				print(f"Command '{editor_name}' exited with code '{exit_code}'.")
+				quit(1)
 
 			for j in pathlib.Path("./").glob('**/*'):
 
 				# Look at all files, excluding 'PKGBUILD', '.SRCINFO', and
 				# everything in the '.git' folder
 				if str(j) != 'PKGBUILD' and str(j) != '.SRCINFO' and bool(re.match('^\.git/', str(j))) == False and os.path.isfile(j) == True:
-					os.system(f"nano '{j}'")
+					exit_code = subprocess.call(f"'{editor_name}' '{j}'", shell=True)
+
+					if exit_code != 0:
+						print(f"Command '{editor_name}' exited with code '{exit_code}'.")
+						quit(1)
 
 			time.sleep(1)
 
