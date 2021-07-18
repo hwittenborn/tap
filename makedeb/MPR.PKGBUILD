@@ -1,10 +1,10 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=tap
-pkgver=0.11.1
+pkgver=0.11.2
 pkgrel=1
 pkgdesc="MPR in your pocket"
 arch=('any')
-depends=('python3')
+depends=('python3' 'python3-requests')
 license=('GPL3')
 control_fields=("MPR-Package: ${pkgname}")
 url="https://github.com/hwittenborn/tap"
