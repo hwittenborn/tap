@@ -104,7 +104,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		print()
 		print("The following packages have unmet dependencies:")
-		print(f"  {bad_apt_dependencies}")
+		print(f" {bad_apt_dependencies}")
 		quit()
 
 	# Go over what'll be installed
@@ -115,12 +115,12 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	if apt_removal_dependencies != "":
 		print()
 		print('The following packages are going to be REMOVED:')
-		print(f"  {apt_removal_dependencies}")
+		print(f" {apt_removal_dependencies}")
 
 	if apt_needed_dependencies != "":
 		print()
 		print("The following dependencies are going to be installed:")
-		print(f"  {apt_needed_dependencies}")
+		print(f" {apt_needed_dependencies}")
 
 	print()
 	print(f"The following packages are going to be built and {operation_string}:")
