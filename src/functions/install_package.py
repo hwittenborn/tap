@@ -223,7 +223,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			makedeb_exit_code = os.system("makedeb -v")
 
 		else:
-		 	makedeb_exit_code = os.system("makedeb -vH 'MPR-Package: True'")
+		 	makedeb_exit_code = os.system(f"makedeb -vH 'MPR-Package: {i}'")
 
 		if makedeb_exit_code != 0:
 		 	print(f"There was an issue building package '{i}'. Aborting...")
