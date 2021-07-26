@@ -33,6 +33,10 @@ if argument_value == "-h" or argument_value == "--help":
 	help_menu(application_name, application_version)
 	quit(0)
 
+elif argument_value == "-V" or argument_value == "--version":
+	print(f"{application_name} ({application_version})")
+	quit(0)
+
 elif argument_value == "install":
 	root_check()
 	operation = "install"
@@ -57,14 +61,20 @@ packages_temp = []
 
 while number <= argument_list_length:
 
+	# Check for options ('-*' or '--*' strings)
 	if argument_list[number] == "-h" or argument_list[number] == "--help":
 		help_menu(application_name, application_version)
 		quit(0)
+
+	elif argument_list[number] == "-V" or argument_list[number] == "--version":
+			print(f"{application_name} ({application_version})")
+			quit(0)
 
 	elif bool(re.match('^-.*', argument_list[number])) == True:
 		print(f"Unknown option '{argument_list[number]}'")
 		bad_argument_option = True
 
+	# Everything else is a package
 	else:
 		packages_temp += [argument_list[number]]
 

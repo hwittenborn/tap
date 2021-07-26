@@ -11,3 +11,4 @@ def help_menu(application_name, application_version):
 	print()
 	print("Options:")
 	print("  -h, --help        Bring up this help menu")
+	print("  -V, --version     Print version information and exit")
