@@ -25,6 +25,7 @@ git clone "ssh://mpr@${mpr_url}/tap.git" "tap-mpr"
 
 rm "tap-mpr/PKGBUILD"
 cp "makedeb/MPR.PKGBUILD" "tap-mpr/PKGBUILD"
+cp "makedeb/.install" "tap-mpr/.install"
 
 chown user:user "tap-mpr" -R
 
@@ -34,7 +35,7 @@ sudo -u user -- makepkg --printsrcinfo | tee .SRCINFO
 
 package_version="$(cat .SRCINFO | grep 'pkgver' | awk -F ' = ' '{print $2}')"
 package_relationship="$(cat .SRCINFO | grep 'pkgrel' | awk -F ' = ' '{print $2}')"
-git add PKGBUILD .SRCINFO
+git add PKGBUILD .SRCINFO .install
 git commit -m "Updated version to ${package_version}-${package_relationship}"
 
 git push
