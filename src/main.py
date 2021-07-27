@@ -11,6 +11,7 @@ from functions.install_package import install_package    # REMOVE AT PACKAGING
 from functions.update_package import update_package      # REMOVE AT PACKAGING
 from functions.search_package import search_package      # REMOVE AT PACKAGING
 from functions.root_check import root_check              # REMOVE AT PACKAGING
+from functions.list_packages import list_packages        # REMOVE AT PACKAGING
 
 # Variables we need to function
 application_name = "tap"
@@ -51,6 +52,9 @@ elif argument_value == "search":
 elif argument_value == "clone":
 	operation = "clone"
 
+elif argument_value == "list-packages":
+	operation = "list-packages"
+
 else:
 	print(f"Unknown command '{argument_value}'")
 	quit(1)
@@ -87,8 +91,8 @@ except NameError: bad_argument_option = False
 if bad_argument_option == True:
 	quit(1)
 
-elif operation == "update" and len(packages_temp) != 0:
-	print("Packages cannot be specified when using the update/upgrade command.")
+elif ( operation == "update" or operation == "list-packages" ) and len(packages_temp) != 0:
+	print(f"Packages cannot be specified when using the {operation} command.")
 	quit(1)
 
 elif (operation == "install" or operation == "search" or operation == "clone" ) and len(packages_temp) == 0:
@@ -106,3 +110,6 @@ elif operation == "update":
 
 elif operation == "search":
 	search_package(mpr_url, packages, application_name, application_version)
+
+elif operation == "list-packages":
+	list_packages()

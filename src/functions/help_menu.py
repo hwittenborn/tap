@@ -7,7 +7,7 @@ def help_menu(application_name, application_version):
 	print("  install           Install packages")
 	print("  update/upgrade    Update packages")
 	print("  search            Search for packages")
-	# print("  clone             Clone packages")
+	print("  list-packages     List installed packages that were built from the MPR")
 	print()
 	print("Options:")
 	print("  -h, --help        Bring up this help menu")
