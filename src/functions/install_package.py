@@ -265,7 +265,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	# Install packages
 	print("Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
-	apt_exit_code = os.system(f"eval sudo apt install {apt_installation_list}")
+	apt_exit_code = os.system(f"eval sudo apt-get reinstall {apt_installation_list}")
 
 	if apt_exit_code != 0:
 		print("There was an error installation the packages.")
