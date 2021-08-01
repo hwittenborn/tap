@@ -1,10 +1,10 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=tap
-pkgver=0.14.0
+pkgver=0.15.0
 pkgrel=1
 pkgdesc="MPR in your pocket"
 arch=('any')
-depends=('python3' 'python3-requests')
+depends=('python3' 'python3-requests' 'bash-completion' 'jq')
 conflicts=('node-tap')
 license=('GPL3')
 control_fields=("MPR-Package: ${pkgname}")
@@ -37,4 +37,7 @@ package() {
 
 	# Set perms on executable
 	chmod 555 "${pkgdir}/usr/bin/tap"
+
+	# Install completion script
+	install -Dm 555 "completions/tap.bash" "${pkgdir}/usr/share/bash-completion/completions/tap"
 }

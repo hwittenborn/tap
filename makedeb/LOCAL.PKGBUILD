@@ -34,4 +34,7 @@ package() {
 
 	# Set perms on executable
 	chmod 555 "${pkgdir}/usr/bin/tap"
+
+	# Install completion script
+	install -Dm 555 "completions/tap.bash" "${pkgdir}/usr/share/bash-completion/completions/tap"
 }
