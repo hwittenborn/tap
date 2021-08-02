@@ -38,31 +38,34 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	else:
 		mpr_package_names = sorted(mpr_package_names_temp)
 
+	# Generate output
+	loop_number = 0
+
 	for i in mpr_package_names:
-		number = 0
+		mpr_json_package_number = 0
 
 		# Get array placement of package inside JSON data
-		while number < mpr_resultcount:
-			if mpr_rpc_json_data['results'][number]['Name'] == i:
+		while mpr_json_package_number < mpr_resultcount:
+			if mpr_rpc_json_data['results'][mpr_json_package_number]['Name'] == i:
 				break
 
 			else:
-				number = number + 1
+				mpr_json_package_number = mpr_json_package_number + 1
 
 		# Get JSON data
-		package_name = mpr_rpc_json_data['results'][number]['Name']
-		package_version = mpr_rpc_json_data['results'][number]['Version']
-		package_description = mpr_rpc_json_data['results'][number]['Description']
-		package_maintainer = mpr_rpc_json_data['results'][number]['Maintainer']
-		package_votes = mpr_rpc_json_data['results'][number]['NumVotes']
+		package_name = mpr_rpc_json_data['results'][mpr_json_package_number]['Name']
+		package_version = mpr_rpc_json_data['results'][mpr_json_package_number]['Version']
+		package_description = mpr_rpc_json_data['results'][mpr_json_package_number]['Description']
+		package_maintainer = mpr_rpc_json_data['results'][mpr_json_package_number]['Maintainer']
+		package_votes = mpr_rpc_json_data['results'][mpr_json_package_number]['NumVotes']
 
-		outofdate = mpr_rpc_json_data['results'][number]['OutOfDate']
+		outofdate = mpr_rpc_json_data['results'][mpr_json_package_number]['OutOfDate']
 		if outofdate == None:
 			package_outofdate = "N/A"
 		else:
 			package_outofdate = datetime.datetime.fromtimestamp(outofdate).strftime('%Y-%m-%d')
 
-		package_lastmodified_json = mpr_rpc_json_data['results'][number]['LastModified']
+		package_lastmodified_json = mpr_rpc_json_data['results'][mpr_json_package_number]['LastModified']
 		package_lastmodified = datetime.datetime.fromtimestamp(package_lastmodified_json).strftime('%Y-%m-%d')
 
 		# Print generated text
@@ -73,7 +76,7 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 		print(f"  Out of Date: {package_outofdate}")
 		print(f"  Last Modified: {package_lastmodified}")
 
-		if (number + 1) < mpr_rpc_json_data["resultcount"]:
+		if (loop_number + 1) < mpr_resultcount:
 			print()
 
-		number = number + 1
+		loop_number = loop_number + 1
