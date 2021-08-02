@@ -18,6 +18,12 @@ def list_packages(argument_options):
 			number = number + 1
 			mpr_package_info += [is_mpr_package.group(0).split('///')]
 
+	if check_argument_option(argument_options, "rev-alpha") == True:
+		mpr_package_info = sorted(mpr_package_info, reverse=True)
+
+	else:
+		mpr_package_info = sorted(mpr_package_info)
+
 	if number > 0:
 
 		list_packages_output_temp = ""

@@ -5,13 +5,13 @@ import os
 import sys
 import re
 
-from functions.arg_check import arg_check                # REMOVE AT PACKAGING
-from functions.help_menu import help_menu                # REMOVE AT PACKAGING
-from functions.install_package import install_package    # REMOVE AT PACKAGING
-from functions.update_package import update_package      # REMOVE AT PACKAGING
-from functions.search_package import search_package      # REMOVE AT PACKAGING
-from functions.root_check import root_check              # REMOVE AT PACKAGING
-from functions.list_packages import list_packages        # REMOVE AT PACKAGING
+from functions.arg_check              import  arg_check              # REMOVE AT PACKAGING
+from functions.help_menu              import  help_menu              # REMOVE AT PACKAGING
+from functions.install_package        import  install_package        # REMOVE AT PACKAGING
+from functions.update_package         import  update_package         # REMOVE AT PACKAGING
+from functions.search_package         import  search_package         # REMOVE AT PACKAGING
+from functions.root_check             import  root_check             # REMOVE AT PACKAGING
+from functions.list_packages          import  list_packages          # REMOVE AT PACKAGING
 
 # Variables we need to function
 application_name = "tap"
@@ -74,6 +74,9 @@ while number <= argument_list_length:
 	elif argument_list[number] == "-L" or argument_list[number] == "--skip-less-pipe":
 		argument_options += ["no-less-pipe"]
 
+	elif argument_list[number] == "-R" or argument_list[number] == "--rev-alpha":
+		argument_options += ["rev-alpha"]
+
 	elif argument_list[number] == "-V" or argument_list[number] == "--version":
 			print(f"{application_name} ({application_version})")
 			quit(0)
@@ -113,7 +116,7 @@ elif operation == "update":
 	update_package(mpr_url, application_name, application_version)
 
 elif operation == "search":
-	search_package(mpr_url, packages, application_name, application_version)
+	search_package(mpr_url, packages, application_name, application_version, argument_options)
 
 elif operation == "list-packages":
 	list_packages(argument_options)

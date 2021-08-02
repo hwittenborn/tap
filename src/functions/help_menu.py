@@ -12,4 +12,5 @@ def help_menu(application_name, application_version):
 	print("Options:")
 	print("  -h, --help              Bring up this help menu")
 	print("  -L, --skip-less-pipe    Don't pipe output from 'list-packages' into 'less' when output is taller than the terminal height")
+	print("  -R, --rev-alpha         Sort results from 'search' and 'list-packages' from Z-A instead of A-Z")
 	print("  -V, --version           Print version information and exit")

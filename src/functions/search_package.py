@@ -1,9 +1,10 @@
-def search_package(mpr_url, packages, application_name, application_version):
+def search_package(mpr_url, packages, application_name, application_version, argument_options):
 	import requests
 	import json
 	import datetime
 
-	from functions.colors import colors    # REMOVE AT PACKAGING
+	from  functions.colors                 import  colors                 # REMOVE AT PACKAGING
+	from  functions.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
 
 	request_arguments = ""
 
@@ -21,9 +22,32 @@ def search_package(mpr_url, packages, application_name, application_version):
 		print("No results.")
 		quit(0)
 
-	number = 0
+	mpr_resultcount = mpr_rpc_json_data["resultcount"]
 
-	while number < mpr_rpc_json_data["resultcount"]:
+	number = 0
+	mpr_package_names_temp = []
+
+	while number < mpr_resultcount:
+		mpr_package_names_temp += [mpr_rpc_json_data['results'][number]['Name']]
+		number = number + 1
+
+	# Sort package names for search output
+	if check_argument_option(argument_options, "rev-alpha") == True:
+		mpr_package_names = sorted(mpr_package_names_temp, reverse=True)
+
+	else:
+		mpr_package_names = sorted(mpr_package_names_temp)
+
+	for i in mpr_package_names:
+		number = 0
+
+		# Get array placement of package inside JSON data
+		while number < mpr_resultcount:
+			if mpr_rpc_json_data['results'][number]['Name'] == i:
+				break
+
+			else:
+				number = number + 1
 
 		# Get JSON data
 		package_name = mpr_rpc_json_data['results'][number]['Name']
