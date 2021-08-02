@@ -62,6 +62,7 @@ else:
 number = number + 1
 
 packages_temp = []
+argument_options = []
 
 while number <= argument_list_length:
 
@@ -69,6 +70,9 @@ while number <= argument_list_length:
 	if argument_list[number] == "-h" or argument_list[number] == "--help":
 		help_menu(application_name, application_version)
 		quit(0)
+
+	elif argument_list[number] == "-L" or argument_list[number] == "--skip-less-pipe":
+		argument_options += ["no-less-pipe"]
 
 	elif argument_list[number] == "-V" or argument_list[number] == "--version":
 			print(f"{application_name} ({application_version})")
@@ -112,4 +116,4 @@ elif operation == "search":
 	search_package(mpr_url, packages, application_name, application_version)
 
 elif operation == "list-packages":
-	list_packages()
+	list_packages(argument_options)
