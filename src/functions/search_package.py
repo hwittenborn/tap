@@ -2,10 +2,18 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	import requests
 	import json
 	import datetime
+	import os
+	import re
 
 	from  functions.colors                 import  colors                 # REMOVE AT PACKAGING
 	from  functions.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
 
+	# Get list of installed packages on the user's system.
+	# We'll use this to add an '[Installed]' field when a package in the
+	# search results is currently installed.
+	installed_packages = os.popen("dpkg-query --show --showformat '${Package}/\n'").read()
+
+	# Make request to MPR
 	request_arguments = ""
 
 	for i in packages:
@@ -58,18 +66,24 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 		package_description = mpr_rpc_json_data['results'][mpr_json_package_number]['Description']
 		package_maintainer = mpr_rpc_json_data['results'][mpr_json_package_number]['Maintainer']
 		package_votes = mpr_rpc_json_data['results'][mpr_json_package_number]['NumVotes']
-
 		outofdate = mpr_rpc_json_data['results'][mpr_json_package_number]['OutOfDate']
+		package_lastmodified_json = mpr_rpc_json_data['results'][mpr_json_package_number]['LastModified']
+		package_lastmodified = datetime.datetime.fromtimestamp(package_lastmodified_json).strftime('%Y-%m-%d')
+
 		if outofdate == None:
 			package_outofdate = "N/A"
 		else:
 			package_outofdate = datetime.datetime.fromtimestamp(outofdate).strftime('%Y-%m-%d')
 
-		package_lastmodified_json = mpr_rpc_json_data['results'][mpr_json_package_number]['LastModified']
-		package_lastmodified = datetime.datetime.fromtimestamp(package_lastmodified_json).strftime('%Y-%m-%d')
+		is_installed = re.search(f"{i}/", installed_packages)
+
+		if is_installed != None:
+			installed_status = " [Installed]"
+		else:
+			installed_status = ""
 
 		# Print generated text
-		print(f"{colors.apt_green}{package_name}{colors.white}/{package_version}")
+		print(f"{colors.apt_green}{package_name}{colors.white}/{package_version}{installed_status}")
 		print(f"  Description: {package_description}")
 		print(f"  Maintainer: {package_maintainer}")
 		print(f"  Votes: {package_votes}")
