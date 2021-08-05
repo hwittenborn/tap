@@ -9,7 +9,6 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import time
 
 	from functions.get_srcinfo_value                         import  get_srcinfo_value               # REMOVE AT PACKAGING
-	from functions.install_pkg.dependency_checks             import  dependency_checks               # REMOVE AT PACKAGING
 	from functions.install_pkg.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
 
 	from functions.install_pkg.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
