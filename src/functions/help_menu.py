@@ -10,6 +10,7 @@ def help_menu(application_name, application_version):
 	print("  list-packages           List installed packages built from the MPR")
 	print()
 	print("Options:")
+	print("  -e, --min-info        Print extra information when using 'search'")
 	print("  -h, --help              Bring up this help menu")
 	print("  -L, --skip-less-pipe    Don't pipe output from 'list-packages' into 'less' when output is taller than the terminal height")
 	print("  -R, --rev-alpha         Sort results from 'search' and 'list-packages' from Z-A instead of A-Z")

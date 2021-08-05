@@ -83,12 +83,18 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 			installed_status = ""
 
 		# Print generated text
-		print(f"{colors.apt_green}{package_name}{colors.white}/{package_version}{installed_status}")
-		print(f"  Description: {package_description}")
-		print(f"  Maintainer: {package_maintainer}")
-		print(f"  Votes: {package_votes}")
-		print(f"  Out of Date: {package_outofdate}")
-		print(f"  Last Modified: {package_lastmodified}")
+		if check_argument_option(argument_options, "min-info") == True:
+			print(f"{colors.apt_green}{package_name}{colors.white}/{package_version}{installed_status}")
+			print(f"  Description: {package_description}")
+			print(f"  Out of Date: {package_outofdate}")
+
+		else:
+			print(f"{colors.apt_green}{package_name}{colors.white}/{package_version}{installed_status}")
+			print(f"  Description: {package_description}")
+			print(f"  Maintainer: {package_maintainer}")
+			print(f"  Votes: {package_votes}")
+			print(f"  Out of Date: {package_outofdate}")
+			print(f"  Last Modified: {package_lastmodified}")
 
 		if (loop_number + 1) < mpr_resultcount:
 			print()

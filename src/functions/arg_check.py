@@ -57,7 +57,10 @@ def arg_check(argument_list, application_name, application_version):
 	while number <= argument_list_length:
 
 		# Check for options ('-*' or '--*' strings)
-		if argument_list[number] == "-h" or argument_list[number] == "--help":
+		if argument_list[number] == "-e" or argument_list[number] == "--min-info":
+			argument_options += ["min-info"]
+
+		elif argument_list[number] == "-h" or argument_list[number] == "--help":
 			help_menu(application_name, application_version)
 			quit(0)
 
