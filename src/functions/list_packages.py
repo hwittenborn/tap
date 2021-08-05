@@ -5,6 +5,13 @@ def list_packages(argument_options):
 	from functions.colors 				  import  colors                 # REMOVE AT PACKAGING
 	from functions.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
 
+	# We use triple forward-slashes in case a package's description were to ever
+	# include a forward slash. While the triple-slash method isn't full-proof,
+	# it will work for all packages where three slashes in a row aren't present.
+	#
+	# We also prefix dpkg's output with three forward-slashes so we can remove
+	# any lines that don't start with it (following the above note, it will
+	# only happen on multi-lined descriptions).
 	dpkg_package_list_raw = os.popen("dpkg-query --show --showformat '///${MPR-Package}///${Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
 
 	number = 0
