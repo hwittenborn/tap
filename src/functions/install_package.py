@@ -8,12 +8,12 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import pathlib
 	import time
 
-	from functions.get_srcinfo_value                         import  get_srcinfo_value               # REMOVE AT PACKAGING
-	from functions.install_pkg.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
+	from functions.get_srcinfo_value             import  get_srcinfo_value               # REMOVE AT PACKAGING
+	from functions.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
 
-	from functions.install_pkg.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
-	from functions.install_pkg.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
-	from functions.install_pkg.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
+	from functions.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
+	from functions.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
+	from functions.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
 
 	# This is used a bit below to get the editor required to look over build files.
 	# We run this now in case an editor is specified, but it cannot be found
