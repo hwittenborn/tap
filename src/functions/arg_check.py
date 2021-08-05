@@ -1,5 +1,6 @@
 def arg_check(argument_list, application_name, application_version):
 	import re
+	import os
 
 	from functions.help_menu   import  help_menu     # REMOVE AT PACKAGING
 	from functions.root_check  import  root_check    # REMOVE AT PACKAGING
@@ -52,6 +53,14 @@ def arg_check(argument_list, application_name, application_version):
 
 	packages_temp = []
 	argument_options = []
+
+	# Set options from environment variables when set. We do this now as we
+	# want said options to be able to be overwritten by CLI arguments.
+	for i in ["min-info", "skip-less-pipe", "rev-alpha"]:
+		env_string = "TAP_MPR_" + i.upper().replace("-", "_")
+
+		if os.getenv(env_string) != None:
+			argument_options += [i]
 
 	# Loop through all remaining specified options
 	while number <= argument_list_length:
