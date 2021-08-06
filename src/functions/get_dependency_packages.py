@@ -21,4 +21,8 @@ def get_dependency_packages(apt_raw_output, search_string):
 		except:
 			continue
 
-	return re.sub(' +', ' ', apt_returned_dependencies).strip()
+	if len(apt_returned_dependencies) == 0:
+		return []
+
+	else:
+		return re.sub(' +', ' ', apt_returned_dependencies).strip().split(' ')

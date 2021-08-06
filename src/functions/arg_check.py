@@ -108,7 +108,8 @@ def arg_check(argument_list, application_name, application_version):
 		print("No package was specified.")
 		quit(1)
 
-	packages = sorted(packages_temp)
+	# Get unique list of specified packages
+	packages = sorted(list(set(packages_temp)))
 
 	# Return argument list and specified packages
 	return [operation, packages, argument_options]

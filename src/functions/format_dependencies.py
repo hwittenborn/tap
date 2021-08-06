@@ -14,13 +14,19 @@ def format_dependencies(dependencies):
 			except AttributeError:
 				if j == '=':
 					# Needs to be set to a relationship (even when non is found)
-					# for the regex check on 'package_version' below.
+					# for the regex check on 'dependency_version' below.
 					relationship_type = "="
 				continue
 
 		try:
 			dependency_name = re.search(f"^.*{relationship_type}", i).group(0).replace(relationship_type, '')
 			dependency_version = re.search(f"{relationship_type}.*$", i).group(0).replace(relationship_type, '')
+
+			if relationship_type == ">" or relationship_type == "<":
+
+				# Debian policy requires "<" and ">" to be "<<" and ">>", so we
+				# duplicate it when they're set to that.
+				relationship_type = relationship_type + relationship_type
 
 			package_list += [f"{dependency_name} ({relationship_type} {dependency_version})"]
 
