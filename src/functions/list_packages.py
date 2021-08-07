@@ -12,13 +12,13 @@ def list_packages(argument_options):
 	# We also prefix dpkg's output with three forward-slashes so we can remove
 	# any lines that don't start with it (following the above note, it will
 	# only happen on multi-lined descriptions).
-	dpkg_package_list_raw = os.popen("dpkg-query --show --showformat '///${MPR-Package}///${Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
+	dpkg_package_list_raw = os.popen("dpkg-query --show --showformat '///${Package}///${MPR-Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
 
 	number = 0
 	mpr_package_info = []
 
 	for i in dpkg_package_list_raw:
-		is_mpr_package = re.search('^///[^/].*', i)
+		is_mpr_package = re.search('^///[^/]*///[^/].*', i)
 
 		if is_mpr_package != None:
 
@@ -38,8 +38,8 @@ def list_packages(argument_options):
 
 		for i in mpr_package_info:
 
-			list_packages_output_temp += f"{colors.apt_green}{i[2]}{colors.white}/{i[3]}\n"
-			list_packages_output_temp += f"  From: {i[1]}\n"
+			list_packages_output_temp += f"{colors.apt_green}{i[1]}{colors.white}/{i[3]}\n"
+			list_packages_output_temp += f"  From: {i[2]}\n"
 			list_packages_output_temp += f"  Description: {i[4]}\n"
 			list_packages_output_temp += f"  Maintainer: {i[5]}\n"
 
