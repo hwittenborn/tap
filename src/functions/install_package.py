@@ -245,7 +245,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	if len(apt_needed_dependencies) > 1:
 		apt_dependency_package_arguments = ""
-		
+
 		for i in apt_needed_dependencies:
 			apt_dependency_package_arguments += f"'{i}' "
 
