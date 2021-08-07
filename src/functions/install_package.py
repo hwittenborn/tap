@@ -258,6 +258,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		print()
 
+	os.mkdir("/var/tmp/mpm/debs/")
+
 	print("Building packages...")
 
 	apt_installation_list = ""
