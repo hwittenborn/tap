@@ -244,6 +244,11 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		print()
 
 	if len(apt_needed_dependencies) > 1:
+		apt_dependency_package_arguments = ""
+		
+		for i in apt_needed_dependencies:
+			apt_dependency_package_arguments += f"'{i}' "
+
 		print("Installing build dependencies...")
 		apt_install_dependencies_exit_code = os.system(f"eval sudo apt-get satisfy {apt_dependency_package_arguments}")
 
