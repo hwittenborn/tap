@@ -13,7 +13,7 @@ Tap currently contains the following features:
 
 There is also a roadmap [here](https://github.com/hwittenborn/tap/issues/7) that is tracking the development to a 1.0.0 release, which somewhat outlines Tap's current major features.
 
-Tap is currently in very early development, and may thus be highly prone to bugs. If you're not a fan of beta software, please avoid using Tap for the time being.
+Tap is currently in beta, and is also in very rapid development. Likewise, bugs are almost guaranteed to crop up somewhere, and you should avoid Tap for the time being if you're expecting a smooth experience 100% of the time.
 
 ## Installation and usage
 Tap can be installed [directly from the MPR](https://dur.hunterwittenborn.com/packages/tap).
