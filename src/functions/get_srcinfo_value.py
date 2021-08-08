@@ -1,4 +1,4 @@
-def get_srcinfo_value(field):
+def get_srcinfo_value(field, tabbing):
 	import re
 
 	field_value = []
@@ -7,7 +7,10 @@ def get_srcinfo_value(field):
 	open('.SRCINFO', 'r').close()
 
 	for i in srcinfo_data:
-		string_results = re.findall(f"^\t{field} = .*", i)
+		if tabbing == True:
+			string_results = re.findall(f"^\t{field} = .*", i)
+		else:
+			string_results = re.findall(f"^{field} = .*", i)
 
 		if len(string_results) > 0:
 			field_value += [string_results[0].split(' = ')[1]]

@@ -9,6 +9,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import time
 
 	from functions.get_srcinfo_value             import  get_srcinfo_value               # REMOVE AT PACKAGING
+	from functions.get_control_field_value       import  get_control_field_value         # REMOVE AT PACKAGING
 	from functions.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
 
 	from functions.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
@@ -280,42 +281,24 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		 	quit(1)
 
 		# Get package version
-		package_control_version = os.popen("/usr/bin/env bash -c 'source PKGBUILD; if [[ \"$(type -t pkgver)\" == \"function\" ]]; then pkgver; fi'").read()
-
-		if len(package_control_version) == 0:
-			package_version = get_srcinfo_value('pkgver')[0]
-
-		else:
-			package_version = package_control_version
-
-		# Get package relationship
-		package_relationship = get_srcinfo_value('pkgrel')[0]
-
-		# Get system architecture
-		system_architecture = os.popen("dpkg --print-architecture").read().strip()
+		package_control_version = get_control_field_value(i, "Version")
 
 		# Get built package names
-		package_names = get_srcinfo_value('pkgname')
+		package_names = get_srcinfo_value('pkgname', False)
 
 		# Get built archive architecure
-		package_architecture = get_srcinfo_value('arch')[0]
-
-		if package_architecture == 'any':
-			package_architecture = 'all'
-
-		else:
-			package_architecture = system_architecture
+		package_architecture = get_control_field_value(i, "Architecture")
 
 		# Copy built debs to temp directory for installation
 		for j in package_names:
-			shutil.move(f"/var/tmp/mpm/build_dir/{i}/{j}_{package_version}-{package_relationship}_{package_architecture}.deb", f"/var/tmp/mpm/debs/{j}_{package_version}-{package_relationship}_{package_architecture}.deb")
-			apt_installation_list += f" \\''./{j}_{package_version}-{package_relationship}_{package_architecture}.deb'\\'"
+			shutil.move(f"/var/tmp/mpm/build_dir/{i}/{j}_{package_control_version[0]}_{package_architecture[0]}.deb", f"/var/tmp/mpm/debs/{j}_{package_control_version[0]}_{package_architecture[0]}.deb")
+			apt_installation_list += f" \\''./{j}_{package_control_version[0]}_{package_architecture[0]}.deb'\\'"
 
 
 	# Install packages
 	print("Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
-	apt_exit_code = os.system(f"eval sudo apt-get reinstall {apt_installation_list}")
+	apt_exit_code = os.system(f"eval apt-get reinstall --dry-run {apt_installation_list}")
 
 	if apt_exit_code != 0:
 		print("There was an error installation the packages.")

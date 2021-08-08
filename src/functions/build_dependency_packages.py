@@ -21,12 +21,12 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount):
 		depends_packages = []
 
 		for j in ['depends', 'makedepends', 'checkdepends']:
-			depends_packages += get_srcinfo_value(j)
+			depends_packages += get_srcinfo_value(j, False)
 
-		conflicts_packages = get_srcinfo_value("conflicts")
-		replaces_packages = get_srcinfo_value("replaces")
-		breaks_packages = get_srcinfo_value("breaks")
-		provides_packages = get_srcinfo_value("provides")
+		conflicts_packages = get_srcinfo_value("conflicts", False)
+		replaces_packages = get_srcinfo_value("replaces", False)
+		breaks_packages = get_srcinfo_value("breaks", False)
+		provides_packages = get_srcinfo_value("provides", False)
 
 		depends_control = generate_control_string("Depends", depends_packages)
 		conflicts_control = generate_control_string("Conflicts", conflicts_packages)
