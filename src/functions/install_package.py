@@ -11,6 +11,9 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	from functions.get_srcinfo_value             import  get_srcinfo_value               # REMOVE AT PACKAGING
 	from functions.get_control_field_value       import  get_control_field_value         # REMOVE AT PACKAGING
 	from functions.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
+	from functions.builddir_del_err              import  builddir_del_err                # REMOVE AT PACKAGING
+	from functions.colors                        import  colors                          # REMOVE AT PACKAGING
+	from functions.message                       import  message                         # REMOVE AT PACKAGING
 
 	from functions.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
 	from functions.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
@@ -54,30 +57,26 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	unknown_packages = check_unfindable_packages(packages, package_names)
 
 	if len(unknown_packages) != 0:
-		unknown_packages_output = " "
+		unknown_packages_output = ""
 
 		for i in unknown_packages:
-			unknown_packages_output += f" {i}"
+			unknown_packages_output += f"{i}, "
 
-		print("Couldn't find the following packages:")
-		print(unknown_packages_output)
+		unknown_packages_output = re.sub(", $", "", unknown_packages_output)
+		message("error", f"Couldn't find the following packages: {unknown_packages_output}")
 		quit()
 
 
 	# Make sure build directory doesn't exist, and remove it if otherwise
 	if os.path.exists('/var/tmp/mpm/'):
 
-		if os.access('/var/tmp/mpm/', os.W_OK) == False:
-			print("Couldn't delete old build directory. Aborting...")
-			quit(1)
-
-		print("Removing old build directory...")
-		shutil.rmtree('/var/tmp/mpm/')
+		message("info", "Removing old build directory...")
+		shutil.rmtree('/var/tmp/mpm/', onerror=builddir_del_err)
 
 	os.mkdir("/var/tmp/mpm/")
 
 	# Clone packages
-	print("Cloning packages...")
+	message("info", "Cloning packages...")
 
 	os.mkdir("/var/tmp/mpm/build_dir/")
 	os.chdir("/var/tmp/mpm/build_dir/")
@@ -85,11 +84,11 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	git_clone_status = git_clone_packages(packages, mpr_url)
 
 	if git_clone_status[0] == "Fail":
-		print(git_clone_status[1])
+		message("error", git_clone_status[1])
 		quit(1)
 
 	# Check build dependencies
-	print("Checking build dependencies...")
+	message("info", "Checking build dependencies...")
 
 	os.mkdir("/var/tmp/mpm/dependency_debs/")
 	os.mkdir("/var/tmp/mpm/dependency_dir/")
@@ -135,26 +134,26 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		# Abort if there were dependencies that still couldn't be found
 		if len(unfindable_dependencies) != 0:
-			unfindable_dependencies_string = " "
+			unfindable_dependencies_string = ""
 
 			for i in unfindable_dependencies:
-				unfindable_dependencies_string += f" {i}"
+				unfindable_dependencies_string += f"{i}, "
 
-			print("The following dependencies were unable to be found:")
-			print(unfindable_dependencies_string)
+			unfindable_dependencies_string = re.sub(", $", "", unfindable_dependencies_string)
+			message("error", f"The following dependencies were unable to be found: {unfindable_dependencies_string}")
 			quit(1)
 
 		# If all dependencies were found, continue with cloning and checking them
-		print("Cloning additional dependencies from the MPR...")
+		message("info", "Cloning additional dependencies from the MPR...")
 
 		os.chdir("/var/tmp/mpm/build_dir/")
 		git_clone_status = git_clone_packages(bad_apt_dependencies, mpr_url)
 
 		if git_clone_status[0] == "Fail":
-			print(git_clone_status[1])
+			message("error", git_clone_status[1])
 			quit(1)
 
-		print("Rechecking build dependencies against MPR packages...")
+		message("info", "Rechecking build dependencies against MPR packages...")
 		build_dependency_packages(mpr_rpc_json_data, resultcount)
 
 		os.chdir("/var/tmp/mpm/dependency_debs/")
@@ -182,7 +181,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	for i in packages:
 		apt_package_text += f" {i}"
 
-	print()
+	print(colors.bold)
 
 	if len(apt_removal_dependencies) != 0:
 		print(generate_apt_styled_text("The following package are going to be REMOVED:", apt_removal_dependencies))
@@ -200,12 +199,13 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	print()
 
 	print(f"{len(master_package_names)} to build, {len(apt_upgraded_dependencies)} to upgrade, {len(apt_newly_installed)} to newly install and {len(apt_removal_dependencies)} to remove.")
-	print()
+	print(colors.white)
 
-	continue_status = input("Would you like to continue? [Y/n] ")
+	question_string = message("question", "Would you like to continue? [Y/n] ", value_return=True)
+	continue_status = input(question_string)
 
 	if len(continue_status) != 0 and continue_status != 'Y' and continue_status != 'y':
-		print("Quitting...")
+		message("info", "Quitting...")
 		quit(1)
 
 	print()
@@ -213,7 +213,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	for i in master_package_names:
 		os.chdir(f"/var/tmp/mpm/build_dir/{i}")
 
-		confirm_status = input(f"Look over files for '{i}'? [Y/n] ")
+		question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
+		confirm_status = input(question_string)
 
 		file_list = []
 
@@ -224,7 +225,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			exit_code = subprocess.call(f"'{editor_name}' PKGBUILD", shell=True)
 
 			if exit_code != 0:
-				print(f"Command '{editor_name}' exited with code '{exit_code}'.")
+				message("error", f"Command '{editor_name}' exited with code '{exit_code}'.")
 				quit(1)
 
 			for j in pathlib.Path("./").glob('**/*'):
@@ -235,12 +236,13 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 					exit_code = subprocess.call(f"'{editor_name}' '{j}'", shell=True)
 
 					if exit_code != 0:
-						print(f"Command '{editor_name}' exited with code '{exit_code}'.")
+						message("error", f"Command '{editor_name}' exited with code '{exit_code}'.")
 						quit(1)
 
 			time.sleep(1)
 
-			confirm_status = input(f"Look over files for '{i}'? [Y/n] ")
+			question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
+			confirm_status = input(question_string)
 
 		print()
 
@@ -250,18 +252,18 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		for i in apt_needed_dependencies:
 			apt_dependency_package_arguments += f"'{i}' "
 
-		print("Installing build dependencies...")
+		message("info", "Installing build dependencies...")
 		apt_install_dependencies_exit_code = os.system(f"eval sudo apt-get satisfy {apt_dependency_package_arguments}")
 
 		if apt_install_dependencies_exit_code != 0:
-			print("There was an error installing build dependencies.")
+			message("error", "There was an error installing build dependencies.")
 			quit(1)
 
 		print()
 
 	os.mkdir("/var/tmp/mpm/debs/")
 
-	print("Building packages...")
+	message("info", "Building packages...")
 
 	apt_installation_list = ""
 
@@ -277,7 +279,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		 	makedeb_exit_code = os.system(f"makedeb -vH 'MPR-Package: {i}'")
 
 		if makedeb_exit_code != 0:
-		 	print(f"There was an issue building package '{i}'. Aborting...")
+		 	message("error", f"There was an issue building package '{i}'. Aborting...")
 		 	quit(1)
 
 		# Get package version
@@ -296,7 +298,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 
 	# Install packages
-	print("Installing packages...")
+	message("info", "Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
 	apt_exit_code = os.system(f"eval sudo apt-get reinstall {apt_installation_list}")
 
