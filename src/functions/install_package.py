@@ -185,15 +185,12 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	if len(apt_removal_dependencies) != 0:
 		print(generate_apt_styled_text("The following package are going to be REMOVED:", apt_removal_dependencies))
-		print()
 
 	if len(apt_needed_dependencies) != 0:
 		print(generate_apt_styled_text(f"The following additional packages are going to be installed:", apt_needed_dependencies))
-		print()
 
 	if len(apt_upgraded_dependencies) != 0:
 		print(generate_apt_styled_text("The following packages will be upgraded:", apt_upgraded_dependencies))
-		print()
 
 	print(generate_apt_styled_text(f"The following packages are going to be built:", master_package_names))
 	print()
@@ -203,13 +200,12 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	question_string = message("question", "Would you like to continue? [Y/n] ", value_return=True)
 	continue_status = input(question_string + colors.bold)
-	print(colors.white)
 
 	if len(continue_status) != 0 and continue_status != 'Y' and continue_status != 'y':
 		message("info", "Quitting...")
 		quit(1)
 
-	print()
+	print(colors.white)
 
 	for i in master_package_names:
 		os.chdir(f"/var/tmp/mpm/build_dir/{i}")
