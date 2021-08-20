@@ -202,7 +202,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	print(colors.white)
 
 	question_string = message("question", "Would you like to continue? [Y/n] ", value_return=True)
-	continue_status = input(question_string)
+	continue_status = input(question_string + colors.bold)
+	print(colors.white)
 
 	if len(continue_status) != 0 and continue_status != 'Y' and continue_status != 'y':
 		message("info", "Quitting...")
@@ -214,7 +215,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		os.chdir(f"/var/tmp/mpm/build_dir/{i}")
 
 		question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
-		confirm_status = input(question_string)
+		confirm_status = input(question_string + colors.bold)
+		print(colors.white)
 
 		file_list = []
 
@@ -242,7 +244,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			time.sleep(1)
 
 			question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
-			confirm_status = input(question_string)
+			confirm_status = input(question_string + colors.bold)
+			print(colors.white)
 
 		print()
 
