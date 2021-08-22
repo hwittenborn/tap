@@ -212,7 +212,6 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 		question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
 		confirm_status = input(question_string + colors.bold)
-		print(colors.white)
 
 		file_list = []
 
@@ -241,18 +240,17 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 			question_string = message("question", f"Look over files for '{i}'? [Y/n] ", value_return=True)
 			confirm_status = input(question_string + colors.bold)
-			print(colors.white)
 
 		print()
 
-	if len(apt_needed_dependencies) > 1:
-		apt_dependency_package_arguments = ""
+	if len(apt_needed_dependencies) > 0:
+		apt_command = ["sudo", "apt-get", "satisfy", "--"]
 
 		for i in apt_needed_dependencies:
-			apt_dependency_package_arguments += f"'{i}' "
+			apt_command += [i]
 
 		message("info", "Installing build dependencies...")
-		apt_install_dependencies_exit_code = os.system(f"eval sudo apt-get satisfy {apt_dependency_package_arguments}")
+		apt_install_dependencies_exit_code = subprocess.run(apt_command).returncode
 
 		if apt_install_dependencies_exit_code != 0:
 			message("error", "There was an error installing build dependencies.")
@@ -264,7 +262,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	message("info", "Building packages...")
 
-	apt_installation_list = ""
+	apt_command = ["sudo", "apt-get", "reinstall", "--"]
 
 	for i in master_package_names:
 		os.chdir(f"/var/tmp/mpm/build_dir/{i}")
@@ -293,17 +291,17 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		# Copy built debs to temp directory for installation
 		for j in package_names:
 			shutil.move(f"/var/tmp/mpm/build_dir/{i}/{j}_{package_control_version[0]}_{package_architecture[0]}.deb", f"/var/tmp/mpm/debs/{j}_{package_control_version[0]}_{package_architecture[0]}.deb")
-			apt_installation_list += f" \\''./{j}_{package_control_version[0]}_{package_architecture[0]}.deb'\\'"
+			apt_command += f"./{j}_{package_control_version[0]}_{package_architecture[0]}.deb"
 
 
 	# Install packages
 	message("info", "Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
-	apt_exit_code = os.system(f"eval sudo apt-get reinstall {apt_installation_list}")
+	apt_exit_code = subprocess.run(apt_command).returncode
 
 	if apt_exit_code != 0:
-		print("There was an error installation the packages.")
+		message("error", "There was an error installation the packages.")
 		quit(1)
 
-	print('Done.')
+	message("info", "Done.")
 	quit(0)
