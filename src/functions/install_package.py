@@ -244,16 +244,32 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		print()
 
 	if len(apt_needed_dependencies) > 0:
-		apt_command = ["sudo", "apt-get", "satisfy", "--"]
+		apt_satisfy_command = ["sudo", "apt-get", "satisfy", "--"]
+		apt_mark_command = ["sudo", "apt-mark", "auto", "--"]
 
 		for i in apt_needed_dependencies:
-			apt_command += [i]
+			apt_satisfy_command += [i]
+			apt_mark_command += [i]
 
 		message("info", "Installing build dependencies...")
-		apt_install_dependencies_exit_code = subprocess.run(apt_command).returncode
 
-		if apt_install_dependencies_exit_code != 0:
+		# Install build dependencies.
+		apt_satisfy_exit_code = subprocess.run(apt_satisfy_command).returncode
+
+		if apt_satisfy_exit_code != 0:
 			message("error", "There was an error installing build dependencies.")
+			quit(1)
+
+		# Mark them as automatically installed.
+		apt_mark_exit_code = subprocess.run(apt_mark_command, stdout=subprocess.DEVNULL).returncode
+
+		if apt_mark_exit_code != 0:
+			message("error", "There was an error marking installed build dependencies as automatically installed.")
+			message("error", "You may need to mark the following packages as automatically installed with 'sudo apt-mark auto':")
+
+			for i in apt_needed_dependencies:
+				message("error2", i)
+
 			quit(1)
 
 		print()

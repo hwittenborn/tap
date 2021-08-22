@@ -10,6 +10,8 @@ def message(type, message, **args):
         message_string = f"{colors.bold_green}[#]{colors.bold_white} {message}{colors.white}"
     elif type == "error":
         message_string = f"{colors.bold_red}[!]{colors.bold_white} {message}{colors.white}"
+    elif type == "error2":
+        message_string = f"{colors.bold_red}[>>]{colors.bold_white} {message}{colors.white}"
     elif type == "question":
         message_string = f"{colors.bold_cyan}[?]{colors.bold_white} {message}{colors.white}"
     else:
