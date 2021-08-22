@@ -6,6 +6,7 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	import re
 
 	from  functions.colors                 import  colors                 # REMOVE AT PACKAGING
+	from  functions.message                import  message                # REMOVE AT PACKAGING
 	from  functions.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
 
 	# Get list of installed packages on the user's system.
@@ -19,7 +20,11 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	for i in packages:
 		request_arguments += i
 
-	mpr_rpc_request = requests.get(f"https://{mpr_url}/rpc/?v=5&type=search&arg={request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
+	try:
+		mpr_rpc_request = requests.get(f"https://{mpr_url}/rpc/?v=5&type=search&arg={request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
+	except requests.exceptions.ConnectionError:
+		message("error", "Failed to make request to MPR.")
+		quit(1)
 
 	try: mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
 	except json.decoder.JSONDecodeError:
