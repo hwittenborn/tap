@@ -309,10 +309,10 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		# Copy built debs to temp directory for installation
 		for j in package_names:
 			shutil.move(f"/var/tmp/mpm/build_dir/{i}/{j}_{package_control_version[0]}_{package_architecture[0]}.deb", f"/var/tmp/mpm/debs/{j}_{package_control_version[0]}_{package_architecture[0]}.deb")
-			apt_command += f"./{j}_{package_control_version[0]}_{package_architecture[0]}.deb"
+			apt_command += [f"./{j}_{package_control_version[0]}_{package_architecture[0]}.deb"]
 
 	print()
-	
+
 	# Install packages
 	message("info", "Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
