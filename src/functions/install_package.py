@@ -281,6 +281,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	apt_command = ["sudo", "apt-get", "reinstall", "--"]
 
 	for i in master_package_names:
+		print()
+
 		os.chdir(f"/var/tmp/mpm/build_dir/{i}")
 
 		mpr_control_fields = os.popen('/usr/bin/env bash -c \'source PKGBUILD; echo "${control_fields}" | sed "s| |\\n|g" | grep "^MPR-Package:"\'').read()
@@ -309,7 +311,8 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			shutil.move(f"/var/tmp/mpm/build_dir/{i}/{j}_{package_control_version[0]}_{package_architecture[0]}.deb", f"/var/tmp/mpm/debs/{j}_{package_control_version[0]}_{package_architecture[0]}.deb")
 			apt_command += f"./{j}_{package_control_version[0]}_{package_architecture[0]}.deb"
 
-
+	print()
+	
 	# Install packages
 	message("info", "Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
