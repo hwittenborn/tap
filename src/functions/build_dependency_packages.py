@@ -2,6 +2,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount):
 	import os
 	import shutil
 	import subprocess
+	import distro
 
 	from functions.get_srcinfo_value  import  get_srcinfo_value                # REMOVE AT PACKAGING
 	from functions.generate_control_string  import  generate_control_string    # REMOVE AT PACKAGING
@@ -20,7 +21,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount):
 
 		depends_packages = []
 
-		for j in ['depends', 'makedepends', 'checkdepends']:
+		for j in ['depends', 'makedepends', 'checkdepends', (distro.codename() + '_depends')]:
 			depends_packages += get_srcinfo_value(j, True)
 
 		conflicts_packages = get_srcinfo_value("conflicts", False)
