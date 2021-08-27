@@ -1,4 +1,4 @@
-def build_dependency_packages(mpr_rpc_json_data, resultcount):
+def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 	import os
 	import shutil
 	import subprocess
@@ -20,19 +20,38 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount):
 
 		depends_packages = []
 
-		for j in ['depends', 'makedepends', 'checkdepends', (subprocess.check_output(["lsb_release", "-cs"]) + '_depends')]:
+		if j == (subprocess.check_output(["lsb_release", "-cs"]) + '_depends'):
 			depends_packages += get_srcinfo_value(j, True)
+		else:
+			for j in ['depends', 'makedepends', 'checkdepends']:
+				depends_packages += get_srcinfo_value(j, True)
 
-		conflicts_packages = get_srcinfo_value("conflicts", False)
-		replaces_packages = get_srcinfo_value("replaces", False)
-		breaks_packages = get_srcinfo_value("breaks", False)
-		provides_packages = get_srcinfo_value("provides", False)
+
+        conflicts_packages_ds = get_srcinfo_value((os_codename + '_conflicts'), False)
+		replaces_packages_ds = get_srcinfo_value((os_codename + '_replaces'), False)
+		breaks_packages_ds = get_srcinfo_value((os_codename + '_breaks'), False)
+		provides_packages_ds = get_srcinfo_value((os_codename + '_provides'), False)
+
+		if conflicts_packages_ds == []:
+			conflicts_packages = get_srcinfo_value("conflicts", False)
+			conflicts_packages_ds = conflicts_packages
+		if replaces_packages_ds == []:
+			replaces_packages = get_srcinfo_value("replaces", False)
+			replaces_packages_ds = replaces_packages
+		if breaks_packages_ds == []:
+			breaks_packages = get_srcinfo_value("breaks", False)
+			breaks_packages_ds = breaks_packages
+		if provides_packages_ds == []:
+			provides_packages = get_srcinfo_value("provides", False)
+			provides_packages_ds = provides_packages
+
+
 
 		depends_control = generate_control_string("Depends", depends_packages)
-		conflicts_control = generate_control_string("Conflicts", conflicts_packages)
-		replaces_control = generate_control_string("Replaces", replaces_packages)
-		breaks_control = generate_control_string("Breaks", breaks_packages)
-		provides_control = generate_control_string("Provides", provides_packages)
+		conflicts_control = generate_control_string("Conflicts", conflicts_packages_ds)
+		replaces_control = generate_control_string("Replaces", replaces_packages_ds)
+		breaks_control = generate_control_string("Breaks", breaks_packages_ds)
+		provides_control = generate_control_string("Provides", provides_packages_ds)
 
 		os.mkdir(f"{package_name}")
 		os.mkdir(f"{package_name}/DEBIAN/")
