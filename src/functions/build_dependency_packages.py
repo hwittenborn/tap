@@ -20,14 +20,14 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 
 		depends_packages = []
 
-		if j == (subprocess.check_output(["lsb_release", "-cs"]) + '_depends'):
+		if j in [(os_codename + '_depends'), (os_codename + '_makedepends'),(os_codename + '_checkdepends')]:
 			depends_packages += get_srcinfo_value(j, True)
 		else:
 			for j in ['depends', 'makedepends', 'checkdepends']:
 				depends_packages += get_srcinfo_value(j, True)
 
 
-        conflicts_packages_ds = get_srcinfo_value((os_codename + '_conflicts'), False)
+		conflicts_packages_ds = get_srcinfo_value((os_codename + '_conflicts'), False)
 		replaces_packages_ds = get_srcinfo_value((os_codename + '_replaces'), False)
 		breaks_packages_ds = get_srcinfo_value((os_codename + '_breaks'), False)
 		provides_packages_ds = get_srcinfo_value((os_codename + '_provides'), False)
