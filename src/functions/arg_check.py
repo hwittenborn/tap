@@ -4,6 +4,7 @@ def arg_check(argument_list, application_name, application_version):
 
 	from functions.help_menu   import  help_menu     # REMOVE AT PACKAGING
 	from functions.root_check  import  root_check    # REMOVE AT PACKAGING
+	from functions.message     import  message       # REMOVE AT PACKAGING
 
 	if len(argument_list) == 0:
 		help_menu(application_name, application_version)
@@ -40,7 +41,7 @@ def arg_check(argument_list, application_name, application_version):
 		operation = "list-packages"
 
 	else:
-		print(f"Unknown command '{argument_value}'")
+		message("error", f"Unknown command '{argument_value}'")
 		quit(1)
 
 	# Specifying arrays (i.e. 'hi[1]') starts at 0 for the first argument, but
@@ -84,7 +85,7 @@ def arg_check(argument_list, application_name, application_version):
 				quit(0)
 
 		elif bool(re.match('^-.*', argument_list[number])) == True:
-			print(f"Unknown option '{argument_list[number]}'")
+			message("error", f"Unknown option '{argument_list[number]}'")
 			bad_argument_option = True
 
 		# Everything else is a package
@@ -101,11 +102,11 @@ def arg_check(argument_list, application_name, application_version):
 		quit(1)
 
 	elif ( operation == "update" or operation == "list-packages" ) and len(packages_temp) != 0:
-		print(f"Packages cannot be specified when using the {operation} command.")
+		message("error", f"Packages cannot be specified when using the {operation} command.")
 		quit(1)
 
 	elif (operation == "install" or operation == "search" or operation == "clone" ) and len(packages_temp) == 0:
-		print("No package was specified.")
+		message("error", "No package was specified.")
 		quit(1)
 
 	# Get unique list of specified packages

@@ -28,11 +28,11 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 
 	try: mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
 	except json.decoder.JSONDecodeError:
-		print("[JSON] There was an error processing your request.")
+		message("error", "There was an error processing your request.")
 		quit(1)
 
 	if mpr_rpc_json_data["resultcount"] == 0:
-		print("No results.")
+		message("info", "No results.")
 		quit(0)
 
 	mpr_resultcount = mpr_rpc_json_data["resultcount"]

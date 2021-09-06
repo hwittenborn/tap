@@ -59,11 +59,10 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	if len(unknown_packages) != 0:
 		unknown_packages_output = ""
 
-		for i in unknown_packages:
-			unknown_packages_output += f"{i}, "
+		message("error", "Couldn't find the following packages:")
 
-		unknown_packages_output = re.sub(", $", "", unknown_packages_output)
-		message("error", f"Couldn't find the following packages: {unknown_packages_output}")
+		for i in unknown_packages:
+			message("error2", i)
 		quit()
 
 
