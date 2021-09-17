@@ -17,7 +17,9 @@ from functions.list_packages          import  list_packages          # REMOVE AT
 application_name = "tap"
 application_version = "git"
 mpr_url = "mpr.hunterwittenborn.com"
-os_codename = subprocess.run(["lsb_release", "-cs"])
+os_codename = subprocess.run(["lsb_release", "-cs"],
+                             stdout=subprocess.PIPE,
+                             universal_newlines=True).stdout.strip()
 
 # Argument check
 argument_list = split_args(sys.argv[1:])
