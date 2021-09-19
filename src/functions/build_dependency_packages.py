@@ -20,7 +20,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 
 		depends_packages = []
 
-		if j in [(os_codename + '_depends'), (os_codename + '_makedepends'),(os_codename + '_checkdepends')]:
+		if j in [f'{os_codename}_conflicts', f'{os_codename}_makedepends', f'{os_codename}_checkdepends']:
 			depends_packages += get_srcinfo_value(j, True)
 		else:
 			for j in ['depends', 'makedepends', 'checkdepends']:
@@ -30,7 +30,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 		conflicts_packages_ds = get_srcinfo_value((os_codename + '_conflicts'), False)
 		replaces_packages_ds = get_srcinfo_value((os_codename + '_replaces'), False)
 		breaks_packages_ds = get_srcinfo_value((os_codename + '_breaks'), False)
-		provides_packages_ds = get_srcinfo_value((os_codename + '_provides'), False)
+		provides_packages = get_srcinfo_value((os_codename + '_provides'), False)
 
 		if conflicts_packages_ds == []:
 			conflicts_packages = get_srcinfo_value("conflicts", False)
@@ -43,7 +43,6 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 			breaks_packages_ds = breaks_packages
 		if provides_packages_ds == []:
 			provides_packages = get_srcinfo_value("provides", False)
-			provides_packages_ds = provides_packages
 
 
 
