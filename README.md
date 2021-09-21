@@ -1,7 +1,7 @@
 <h1 align="center">Tap</h2>
 
 ## Overview
-Tap is a second-generation MPR helper written in Python,= being the successor to [mpm](https://github.com/hwittenborn/mpm). It provides numerous benefits over mpm, including a plethora of more features, and an overall smoother and snappier experience.
+Tap is a second-generation MPR helper written in Pyt==hon,= being the successor to [mpm](https://github.com/hwittenborn/mpm). It provides numerous benefits over mpm, including a plethora of more features, and an overall smoother and snappier experience.
 
 Tap currently contains the following features:
 
