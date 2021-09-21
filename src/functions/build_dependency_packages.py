@@ -20,37 +20,43 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 
 		depends_packages = []
 
-		if j in [f'{os_codename}_conflicts', f'{os_codename}_makedepends', f'{os_codename}_checkdepends']:
-			depends_packages += get_srcinfo_value(j, True)
+		for j in ['depends', 'makedepends', 'checkdepends']:
+			distro_dependencies = get_srcinfo_value(f"{os_codename}_{j}", True)
+
+			if distro_dependencies != []:
+				depends_packages += distro_dependencies
+			else:
+				depends_packages += get_srcinfo_value(j, True)
 		else:
 			for j in ['depends', 'makedepends', 'checkdepends']:
 				depends_packages += get_srcinfo_value(j, True)
 
 
-		conflicts_packages_ds = get_srcinfo_value((os_codename + '_conflicts'), False)
-		replaces_packages_ds = get_srcinfo_value((os_codename + '_replaces'), False)
-		breaks_packages_ds = get_srcinfo_value((os_codename + '_breaks'), False)
-		provides_packages = get_srcinfo_value((os_codename + '_provides'), False)
+		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts"), False)
+		distro_replaces_packages = get_srcinfo_value(f"{os_codename}_replaces"), False)
+		distro_breaks_packages = get_srcinfo_value(f"{os_codename}_breaks"), False)
+		provides_packages = get_srcinfo_value(f"{os_codename}_provides"), False)
 
-		if conflicts_packages_ds == []:
+		if distro_conflicts_packages == []:
 			conflicts_packages = get_srcinfo_value("conflicts", False)
-			conflicts_packages_ds = conflicts_packages
-		if replaces_packages_ds == []:
+			distro_conflicts_packages = conflicts_packages
+		if distro_replaces_packages == []:
 			replaces_packages = get_srcinfo_value("replaces", False)
-			replaces_packages_ds = replaces_packages
-		if breaks_packages_ds == []:
+			distro_replaces_packages = replaces_packages
+		if distro_breaks_packages == []:
 			breaks_packages = get_srcinfo_value("breaks", False)
-			breaks_packages_ds = breaks_packages
-		if provides_packages_ds == []:
+			distro_breaks_packages = breaks_packages
+		if distro_provides_packages == []:
 			provides_packages = get_srcinfo_value("provides", False)
+			distro_provides_packages = provides_packages
 
 
 
 		depends_control = generate_control_string("Depends", depends_packages)
-		conflicts_control = generate_control_string("Conflicts", conflicts_packages_ds)
-		replaces_control = generate_control_string("Replaces", replaces_packages_ds)
-		breaks_control = generate_control_string("Breaks", breaks_packages_ds)
-		provides_control = generate_control_string("Provides", provides_packages_ds)
+		conflicts_control = generate_control_string("Conflicts", distro_conflicts_packages)
+		replaces_control = generate_control_string("Replaces", distro_replaces_packages)
+		breaks_control = generate_control_string("Breaks", distro_breaks_packages)
+		provides_control = generate_control_string("Provides", distro_provides_packages)
 
 		os.mkdir(f"{package_name}")
 		os.mkdir(f"{package_name}/DEBIAN/")
