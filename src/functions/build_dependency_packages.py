@@ -29,10 +29,10 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 				depends_packages += get_srcinfo_value(j, True)
 
 
-		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts"), False)
-		distro_replaces_packages = get_srcinfo_value(f"{os_codename}_replaces"), False)
-		distro_breaks_packages = get_srcinfo_value(f"{os_codename}_breaks"), False)
-		provides_packages = get_srcinfo_value(f"{os_codename}_provides"), False)
+		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts", False)
+		distro_replaces_packages = get_srcinfo_value(f"{os_codename}_replaces", False)
+		distro_breaks_packages = get_srcinfo_value(f"{os_codename}_breaks", False)
+		distro_provides_packages = get_srcinfo_value(f"{os_codename}_provides", False)
 
 		if distro_conflicts_packages == []:
 			conflicts_packages = get_srcinfo_value("conflicts", False)
