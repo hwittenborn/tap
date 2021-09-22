@@ -34,7 +34,7 @@ if operation == "install":
 	install_package(mpr_url, packages, "installed", application_name, application_version, os_codename)
 
 elif operation == "update":
-	update_package(mpr_url, application_name, application_version)
+	update_package(mpr_url, application_name, application_version, os_codename)
 
 elif operation == "search":
 	search_package(mpr_url, packages, application_name, application_version, argument_options)

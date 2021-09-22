@@ -1,4 +1,4 @@
-def update_package(mpr_url, application_name, application_version):
+def update_package(mpr_url, application_name, application_version, os_codename):
 	import os
 	import json
 	import requests
@@ -81,4 +81,4 @@ def update_package(mpr_url, application_name, application_version):
 		message("info", "No updates available.")
 		quit(0)
 
-	install_package(mpr_url, to_update, "upgraded", application_name, application_version)
+	install_package(mpr_url, to_update, "upgraded", application_name, application_version, os_codename)
