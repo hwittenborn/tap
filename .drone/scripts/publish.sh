@@ -31,7 +31,7 @@ chown user:user "tap-mpr" -R
 
 cd "tap-mpr"
 
-sudo -u user -- makepkg --printsrcinfo | tee .SRCINFO
+sudo -u user -- makedeb --printsrcinfo | tee .SRCINFO
 
 package_version="$(cat .SRCINFO | grep 'pkgver' | awk -F ' = ' '{print $2}')"
 package_relationship="$(cat .SRCINFO | grep 'pkgrel' | awk -F ' = ' '{print $2}')"
