@@ -4,6 +4,7 @@
 import os
 import sys
 import re
+import subprocess
 
 from functions.split_args             import  split_args             # REMOVE AT PACKAGING
 from functions.arg_check              import  arg_check              # REMOVE AT PACKAGING
@@ -16,6 +17,9 @@ from functions.list_packages          import  list_packages          # REMOVE AT
 application_name = "tap"
 application_version = "git"
 mpr_url = "mpr.hunterwittenborn.com"
+os_codename = subprocess.run(["lsb_release", "-cs"],
+                             stdout=subprocess.PIPE,
+                             universal_newlines=True).stdout.strip()
 
 # Argument check
 argument_list = split_args(sys.argv[1:])
@@ -27,10 +31,10 @@ argument_options = arg_check_results[2]
 
 # Run commands
 if operation == "install":
-	install_package(mpr_url, packages, "installed", application_name, application_version)
+	install_package(mpr_url, packages, "installed", application_name, application_version, os_codename)
 
 elif operation == "update":
-	update_package(mpr_url, application_name, application_version)
+	update_package(mpr_url, application_name, application_version, os_codename)
 
 elif operation == "search":
 	search_package(mpr_url, packages, application_name, application_version, argument_options)

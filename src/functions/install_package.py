@@ -1,4 +1,4 @@
-def install_package(mpr_url, packages, operation_string, application_name, application_version):
+def install_package(mpr_url, packages, operation_string, application_name, application_version, os_codename):
 	import requests
 	import json
 	import re
@@ -92,7 +92,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	os.mkdir("/var/tmp/mpm/dependency_debs/")
 	os.mkdir("/var/tmp/mpm/dependency_dir/")
 
-	build_dependency_packages(mpr_rpc_json_data, resultcount)
+	build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename)
 
 	os.chdir("/var/tmp/mpm/dependency_debs/")
 
