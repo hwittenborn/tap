@@ -12,7 +12,7 @@ def list_packages(argument_options):
 	# We also prefix dpkg's output with three forward-slashes so we can remove
 	# any lines that don't start with it (following the above note, it will
 	# only happen on multi-lined descriptions).
-	dpkg_package_list_raw = os.popen("dpkg-query --show --showformat '///${Package}///${MPR-Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
+	dpkg_package_list_raw = os.popen("LC_ALL=C dpkg-query --show --showformat '///${Package}///${MPR-Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
 
 	number = 0
 	mpr_package_info = []

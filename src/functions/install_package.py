@@ -103,7 +103,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 		apt_dependency_package_list += f" ./{i}.deb"
 
 	# Check dependency listing with APT
-	apt_raw_output = os.popen(f"apt-get install --dry-run {apt_dependency_package_list} 2>&1").read()
+	apt_raw_output = os.popen(f"LC_ALL=C apt-get install --dry-run {apt_dependency_package_list} 2>&1").read()
 
 	# Check MPR for any dependencies that couldn't be found
 	bad_apt_dependencies = process_bad_apt_dependencies(apt_raw_output)
@@ -164,7 +164,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 			apt_dependency_package_list += f" ./{i}.deb"
 
 			# Check dependency listing with APT
-			apt_raw_output = os.popen(f"apt-get install --dry-run {apt_dependency_package_list} 2>&1").read()
+			apt_raw_output = os.popen(f"LC_ALL=C apt-get install --dry-run {apt_dependency_package_list} 2>&1").read()
 
 			# Check MPR for any dependencies that couldn't be found
 			bad_apt_dependencies = process_bad_apt_dependencies(apt_raw_output)
@@ -277,7 +277,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	message("info", "Building packages...")
 
-	apt_command = ["sudo", "apt-get", "reinstall", "--"]
+	apt_command = ["sudo", "LC_ALL=C", "apt-get", "reinstall", "--"]
 
 	for i in master_package_names:
 		print()

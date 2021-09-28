@@ -74,7 +74,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 		file.close()
 
 		# Build dependency package
-		dpkg_command = subprocess.Popen(["dpkg", "-b", f"./{package_name}"], stdout=subprocess.DEVNULL)
+		dpkg_command = subprocess.Popen(["LC_ALL=C", "dpkg", "-b", f"./{package_name}"], stdout=subprocess.DEVNULL)
 		dpkg_command.wait()
 		dpkg_exit_code = dpkg_command.returncode
 

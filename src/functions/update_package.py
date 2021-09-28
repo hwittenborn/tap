@@ -8,7 +8,7 @@ def update_package(mpr_url, application_name, application_version, os_codename):
 	from functions.message         import message            # REMOVE AT PACKAGING
 
 	# Get MPR packages and their respective versions
-	package_list = os.popen("dpkg-query --show --showformat '${Package}/${MPR-Package}/${Version}\n' | grep '^[^/]*/[^/]'").read()
+	package_list = os.popen("LC_ALL=C dpkg-query --show --showformat '${Package}/${MPR-Package}/${Version}\n' | grep '^[^/]*/[^/]'").read()
 
 	request_packages_temp = []
 

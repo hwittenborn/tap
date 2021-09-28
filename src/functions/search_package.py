@@ -12,7 +12,7 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	# Get list of installed packages on the user's system.
 	# We'll use this to add an '[Installed]' field when a package in the
 	# search results is currently installed.
-	installed_packages = os.popen("dpkg-query --show --showformat '${Package}/\n'").read()
+	installed_packages = os.popen("LC_ALL=C dpkg-query --show --showformat '${Package}/\n'").read()
 
 	# Make request to MPR
 	request_arguments = ""
