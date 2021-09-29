@@ -29,22 +29,22 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 				depends_packages += get_srcinfo_value(j, True)
 
 
-		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts", False)
-		distro_replaces_packages = get_srcinfo_value(f"{os_codename}_replaces", False)
-		distro_breaks_packages = get_srcinfo_value(f"{os_codename}_breaks", False)
-		distro_provides_packages = get_srcinfo_value(f"{os_codename}_provides", False)
+		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts", True)
+		distro_replaces_packages = get_srcinfo_value(f"{os_codename}_replaces", True)
+		distro_breaks_packages = get_srcinfo_value(f"{os_codename}_breaks", True)
+		distro_provides_packages = get_srcinfo_value(f"{os_codename}_provides", True)
 
 		if distro_conflicts_packages == []:
-			conflicts_packages = get_srcinfo_value("conflicts", False)
+			conflicts_packages = get_srcinfo_value("conflicts", True)
 			distro_conflicts_packages = conflicts_packages
 		if distro_replaces_packages == []:
-			replaces_packages = get_srcinfo_value("replaces", False)
+			replaces_packages = get_srcinfo_value("replaces", True)
 			distro_replaces_packages = replaces_packages
 		if distro_breaks_packages == []:
-			breaks_packages = get_srcinfo_value("breaks", False)
+			breaks_packages = get_srcinfo_value("breaks", True)
 			distro_breaks_packages = breaks_packages
 		if distro_provides_packages == []:
-			provides_packages = get_srcinfo_value("provides", False)
+			provides_packages = get_srcinfo_value("provides", True)
 			distro_provides_packages = provides_packages
 
 
