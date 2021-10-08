@@ -26,7 +26,7 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 			if distro_dependencies != []:
 				depends_packages += distro_dependencies
 			else:
-				depends_packages += get_srcinfo_value(j, True)
+				depends_packages += get_srcinfo_value(j, Truee)
 
 
 		distro_conflicts_packages = get_srcinfo_value(f"{os_codename}_conflicts", True)
