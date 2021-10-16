@@ -21,6 +21,9 @@ os_codename = subprocess.run(["lsb_release", "-cs"],
                              stdout=subprocess.PIPE,
                              universal_newlines=True).stdout.strip()
 
+# Set LC_ALL env variable to C (LC_ALL=C)
+os.environ["LC_ALL"] = "C"
+
 # Argument check
 argument_list = split_args(sys.argv[1:])
 arg_check_results = arg_check(argument_list, application_name, application_version)
