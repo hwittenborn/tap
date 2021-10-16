@@ -277,7 +277,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 
 	message("info", "Building packages...")
 
-	apt_command = ["sudo", "LC_ALL=C", "apt-get", "reinstall", "--"]
+	apt_command = ["sudo", "apt-get", "reinstall", "--"]
 
 	for i in master_package_names:
 		print()
@@ -315,7 +315,7 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	# Install packages
 	message("info", "Installing packages...")
 	os.chdir("/var/tmp/mpm/debs/")
-	apt_exit_code = subprocess.run(apt_command).returncode
+	apt_exit_code = subprocess.run(apt_command, env=dict(os.environ.copy(), LC_ALL="C")).returncode
 
 	if apt_exit_code != 0:
 		message("error", "There was an error installation the packages.")
