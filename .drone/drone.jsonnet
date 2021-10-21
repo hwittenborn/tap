@@ -24,8 +24,18 @@ local mprPublish() = {
 			},
 
 			commands: [".drone/scripts/publish.sh"]
+		},
+		
+		{
+			name: "send-notification",
+			image: "proget.hunterwittenborn.com/docker/hwittenborn/drone-matrix",
+			settings: {
+				username: "drone",
+				password: {from_secret: "matrix_api_key"},
+				homeserver: "https://matrix.hunterwittenborn.com",
+				room: "#tap:hunterwittenborn.com"
+			}
 		}
-
 	]
 };
 
