@@ -4,8 +4,8 @@ def update_package(mpr_url, application_name, application_version, os_codename):
 	import requests
 	import datetime
 
-	from tap.install_package import install_package    # REMOVE AT PACKAGING
-	from tap.message         import message            # REMOVE AT PACKAGING
+	from tap.install_package import install_package   
+	from tap.message         import message           
 
 	# Get MPR packages and their respective versions
 	package_list = os.popen("dpkg-query --show --showformat '${Package}/${MPR-Package}/${Version}\n' | grep '^[^/]*/[^/]'").read()

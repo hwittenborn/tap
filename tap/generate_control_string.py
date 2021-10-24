@@ -1,5 +1,5 @@
 def generate_control_string(field, values):
-	from tap.format_dependencies  import  format_dependencies    # REMOVE AT PACKAGING
+	from tap.format_dependencies  import  format_dependencies   
 
 	if len(values) == 0:
 		return None

@@ -2,8 +2,8 @@ def list_packages(argument_options):
 	import os
 	import re
 
-	from tap.colors import  colors # REMOVE AT PACKAGING
-	from tap.check_argument_option import check_argument_option # REMOVE AT PACKAGING
+	from tap.colors import  colors
+	from tap.check_argument_option import check_argument_option
 
 	# We use triple forward-slashes in case a package's description were to ever
 	# include a forward slash. While the triple-slash method isn't full-proof,

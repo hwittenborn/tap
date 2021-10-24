@@ -2,9 +2,9 @@ def arg_check(argument_list, application_name, application_version):
 	import re
 	import os
 
-	from tap.help_menu   import  help_menu     # REMOVE AT PACKAGING
-	from tap.root_check  import  root_check    # REMOVE AT PACKAGING
-	from tap.message     import  message       # REMOVE AT PACKAGING
+	from tap.help_menu   import  help_menu    
+	from tap.root_check  import  root_check   
+	from tap.message     import  message      
 
 	if len(argument_list) == 0:
 		help_menu(application_name, application_version)

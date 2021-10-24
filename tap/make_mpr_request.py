@@ -2,7 +2,7 @@ def make_mpr_request(packages, mpr_url, application_name, application_version):
 	import requests
 	import json
 
-	from tap.message import message # REMOVE AT PACKAGING
+	from tap.message import message
 
 	rpc_request_arguments = ""
 
