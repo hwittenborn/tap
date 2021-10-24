@@ -1,5 +1,5 @@
 def message(type, message, **args):
-    from functions.colors import colors # REMOVE AT PACKAGING
+    from tap.colors import colors # REMOVE AT PACKAGING
 
     value_return = False
 

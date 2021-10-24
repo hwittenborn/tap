@@ -1,0 +1,87 @@
+= TAP(8)
+:doctype: manpage
+:hardbreaks:
+:manmanual: Tap manual
+:mansource: TAP {pkgver}
+
+== NAME
+tap - MPR in your pocket
+
+== SYNOPSIS
+*tap install* [_package_]
+*tap search* _search-query_
+*tap update*
+*tap upgrade*
+*tap list-packages*
+
+== DESCRIPTION
+*Tap* is an MPR helper, helping to automate various tasks surrounding interaction with the MPR.
+
+== COMMANDS
+The following must be passed as the first option to *Tap*. All other arguments, such as those in *OPTIONS*, may be passed after.
+
+*install*::
+Installs the specified package via the MPR.
++
+Currently, Tap first checks for missing build dependencies via APT. If any dependencies are unable to be found, Tap then continues by searching the MPR for all remaining dependencies until all are found, or otherwise aborts.
+
+*update*, *upgrade*::
+Checks for and updates installed MPR packages.
++
+Any packages not installed via *Tap* will most likely not be recognized for updates, as *Tap* injects a special control field into all packages it builds (via *makedeb*(8)'s *-H* option) to find which packages it should update. This behavior is intentional, and is designed to prevent standard packages on a user's system (such as *APT*(8) or *dpkg*(1) to provide a good example) that weren't installed via *Tap* from being updated from *Tap*.
+
+*search*::
+Searches the MPR for the specified string.
++
+Searches are done against the names and descriptions of packages on the MPR.
+
+*list-packages*::
+Lists all packages on the system that were installed from the MPR.
+
+== OPTIONS
+*-e*, *--min-info*::
+Hides non-crucial information from the output of *search*.
+
+*-h*, *--help*::
+Brings up the help menu.
+
+*-L*, *--skip-less-pipe*::
+Skips piping of output from *search* and *list-packages* into *LESS*(1) when their output is taller than the terminal's height.
+
+*-R*, *--rev-alpha*::
+Sorts results from *search* and *list-packages* from Z-A instead of A-Z.
+
+*-V*, *--version*::
+Prints version information.
+
+== ENVIRONMENT
+All long options listed under *OPTIONS*, with the exception of *--help* and *--version*, can be provided to *Tap* via environment variables.
+
+To construct the argument, do the following: ::
+`+-+` Remove the double-hyphen (*--*) prefix.
+`+-+` Replace all remaining hypens (*-*) with underscores (`+_+`).
+`+-+` Capitalize all letters.
+`+-+` Prefix the resulting string with *TAP_MPR_*.
+
+For example: ::
+*--min-info*  `+-->+` *TAP_MRP_MIN_INFO*
+*--rev-alpha* `+-->+` *TAP_MPR_REV_ALPHA*
+
+Setting the environment variable to any value will do, as all *Tap* checks for is that the variable is actually set.
+
+== EXIT STATUS
+*Tap* exits with an exit code of 0 on success, and 1 in all other events.
+
+== BUGS
+Issues, as well as feature requests, should be posted on the project's GitHub page: ::
+`+https://github.com/hwittenborn/tap+`
+
+A public Matrix room also exists, which is where most communication involving development and general discussion takes place: ::
+#tap:hunterwittenborn.com
+
+== AUTHORS
+Hunter Wittenborn `+<hunter@hunterwittenborn.com+`
+
+Thanks to everything who has contributed! Your work is greatly appreciated, and only makes Tap better.
+
+A full list of contributors can be found by running *git shortlog -esn* on Tap’s Git repository (linked under *BUGS*).

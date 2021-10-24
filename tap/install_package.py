@@ -8,21 +8,21 @@ def install_package(mpr_url, packages, operation_string, application_name, appli
 	import pathlib
 	import time
 
-	from functions.get_srcinfo_value             import  get_srcinfo_value               # REMOVE AT PACKAGING
-	from functions.get_control_field_value       import  get_control_field_value         # REMOVE AT PACKAGING
-	from functions.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
-	from functions.builddir_del_err              import  builddir_del_err                # REMOVE AT PACKAGING
-	from functions.colors                        import  colors                          # REMOVE AT PACKAGING
-	from functions.message                       import  message                         # REMOVE AT PACKAGING
+	from tap.get_srcinfo_value             import  get_srcinfo_value               # REMOVE AT PACKAGING
+	from tap.get_control_field_value       import  get_control_field_value         # REMOVE AT PACKAGING
+	from tap.get_editor_name               import  get_editor_name                 # REMOVE AT PACKAGING
+	from tap.builddir_del_err              import  builddir_del_err                # REMOVE AT PACKAGING
+	from tap.colors                        import  colors                          # REMOVE AT PACKAGING
+	from tap.message                       import  message                         # REMOVE AT PACKAGING
 
-	from functions.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
-	from functions.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
-	from functions.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
-	from functions.build_dependency_packages     import  build_dependency_packages       # REMOVE AT PACKAGING
-	from functions.git_clone_packages            import  git_clone_packages              # REMOVE AT PACKAGING
-	from functions.make_mpr_request              import  make_mpr_request                # REMOVE AT PACKAGING
-	from functions.check_unfindable_packages     import  check_unfindable_packages       # REMOVE AT PACKAGING
-	from functions.generate_apt_styled_text      import  generate_apt_styled_text        # REMOVE AT PACKAGING
+	from tap.format_dependencies           import  format_dependencies             # REMOVE AT PACKAGING
+	from tap.get_dependency_packages       import  get_dependency_packages         # REMOVE AT PACKAGING
+	from tap.process_bad_apt_dependencies  import  process_bad_apt_dependencies    # REMOVE AT PACKAGING
+	from tap.build_dependency_packages     import  build_dependency_packages       # REMOVE AT PACKAGING
+	from tap.git_clone_packages            import  git_clone_packages              # REMOVE AT PACKAGING
+	from tap.make_mpr_request              import  make_mpr_request                # REMOVE AT PACKAGING
+	from tap.check_unfindable_packages     import  check_unfindable_packages       # REMOVE AT PACKAGING
+	from tap.generate_apt_styled_text      import  generate_apt_styled_text        # REMOVE AT PACKAGING
 
 	# This is used a bit below to get the editor required to look over build files.
 	# We run this now in case an editor is specified, but it cannot be found

@@ -5,9 +5,9 @@ def search_package(mpr_url, packages, application_name, application_version, arg
 	import os
 	import re
 
-	from  functions.colors                 import  colors                 # REMOVE AT PACKAGING
-	from  functions.message                import  message                # REMOVE AT PACKAGING
-	from  functions.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
+	from  tap.colors                 import  colors                 # REMOVE AT PACKAGING
+	from  tap.message                import  message                # REMOVE AT PACKAGING
+	from  tap.check_argument_option  import  check_argument_option  # REMOVE AT PACKAGING
 
 	# Get list of installed packages on the user's system.
 	# We'll use this to add an '[Installed]' field when a package in the

@@ -3,8 +3,8 @@ def build_dependency_packages(mpr_rpc_json_data, resultcount, os_codename):
 	import shutil
 	import subprocess
 
-	from functions.get_srcinfo_value  import  get_srcinfo_value                # REMOVE AT PACKAGING
-	from functions.generate_control_string  import  generate_control_string    # REMOVE AT PACKAGING
+	from tap.get_srcinfo_value  import  get_srcinfo_value                # REMOVE AT PACKAGING
+	from tap.generate_control_string  import  generate_control_string    # REMOVE AT PACKAGING
 
 	number = 0
 
