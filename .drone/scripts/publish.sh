@@ -24,8 +24,7 @@ git config --global user.email "kavplex@hunterwittenborn.com"
 git clone "ssh://mpr@${mpr_url}/tap.git" "tap-mpr"
 
 rm "tap-mpr/PKGBUILD"
-cp "makedeb/MPR.PKGBUILD" "tap-mpr/PKGBUILD"
-cp "makedeb/.install" "tap-mpr/.install"
+cp "makedeb/PKGBUILD" "tap-mpr/PKGBUILD"
 
 chown user:user "tap-mpr" -R
 
@@ -35,7 +34,7 @@ sudo -u user -- makedeb --printsrcinfo | tee .SRCINFO
 
 package_version="$(cat .SRCINFO | grep 'pkgver' | awk -F ' = ' '{print $2}')"
 package_relationship="$(cat .SRCINFO | grep 'pkgrel' | awk -F ' = ' '{print $2}')"
-git add PKGBUILD .SRCINFO .install
+git add PKGBUILD .SRCINFO
 git commit -m "Updated version to ${package_version}-${package_relationship}"
 
 git push
