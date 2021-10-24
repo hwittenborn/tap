@@ -1,84 +1,78 @@
-def update_package(mpr_url, application_name, application_version, os_codename):
-	import os
-	import json
-	import requests
-	import datetime
+def update_package(**args):
+    import os
+    import json
+    import requests
+    import datetime
 
-	from tap.install_package import install_package   
-	from tap.message         import message           
+    from apt_pkg                  import version_compare, TagFile
+    from tap.install_package      import install_package   
+    from tap.message              import message           
+    from tap.make_mpr_request     import make_mpr_request
+    from tap.create_mpr_json_dict import create_mpr_json_dict
 
-	# Get MPR packages and their respective versions
-	package_list = os.popen("dpkg-query --show --showformat '${Package}/${MPR-Package}/${Version}\n' | grep '^[^/]*/[^/]'").read()
+    mpr_url = args["mpr_url"]
+    application_name = args["application_name"]
+    application_version = args["application_version"]
+    os_codename = args["os_codename"]
 
-	request_packages_temp = []
+    # Get list of MPR packages on the user's system.
+    mpr_packages = {}
 
-	for i in package_list.rstrip().splitlines():
-		request_packages_temp += [i.split('/')[1] + '/' + i.split('/')[2]]
+    with TagFile("/var/lib/dpkg/status") as tagfile:
 
-	request_packages = sorted(request_packages_temp)
-	local_packages_number = len(request_packages)
+        for section in tagfile:
+            try:
+                pkgname = section["Package"]
+                pkgver = section["Version"]
+                mpr_package = section["MPR-Package"]
 
-	rpc_request_arguments = ""
+                package_dict = {"pkgver": pkgver,
+                                "mpr_package": mpr_package}
 
-	for i in request_packages:
-		rpc_request_arguments += "&arg[]=" + i.split('/')[0]
+                mpr_packages[pkgname] = package_dict
+            
+            except KeyError:
+                pass
 
-	mpr_rpc_request = requests.get(f"https://{mpr_url}/rpc/?v=5&type=info{rpc_request_arguments}", headers={"User-Agent": f"{application_name}/{application_version}"})
+    # If no MPR packages are present, we're not gonna be able to update anything, so we're just gonna abort.
+    if len(mpr_packages) == 0:
+        message("info", "No updates available.")
+        exit(0)
 
-	try:
-		mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
 
-	except json.decoder.JSONDecodeError:
-		message("error", "There was an error processing your request.")
-		quit(1)
+    # Make MPR request.
+    mpr_json = make_mpr_request(mpr_packages.keys(), mpr_url, application_name, application_version)
+    mpr_json = create_mpr_json_dict(mpr_json)
 
-	if mpr_rpc_json_data['resultcount'] == 0:
-		message("info", "No updates available.")
-		quit(1)
+    # Check which packages need to be updated.
+    to_update = []
+    unknown_packages = []
 
-	# Check for updates
-	resultcount = mpr_rpc_json_data['resultcount'] - 1
-	number = 0
-	to_update = []
-	outofdate_packages = []
+    for package in mpr_packages.keys():
+        # We'll get a KeyError if the package isn't available on the MPR (such as when a package has been deleted).
+        try:
+            mpr_json[package]
+        except KeyError:
+            unknown_packages += [package]
+            continue
 
-	while number <= resultcount:
-		# Get name and version
-		rpc_package_name = mpr_rpc_json_data['results'][number]['Name']
-		rpc_package_version = mpr_rpc_json_data['results'][number]['Version']
-		rpc_package_outofdate = mpr_rpc_json_data['results'][number]['OutOfDate']
+        local_pkgver = mpr_packages[package]["pkgver"]
+        mpr_pkgver = mpr_json[package]["Version"]
 
-		# Add to outofdate_packages list if package is marked out of date so we
-		# can print a warning later.
-		if rpc_package_outofdate is not None:
-			formatted_outofdate_ts = datetime.datetime.fromtimestamp(rpc_package_outofdate).strftime('%Y-%m-%d')
-			outofdate_packages += [[rpc_package_name, formatted_outofdate_ts]]
+        # Positive values mean the first value is higher than the second (and the reverse for negative values, with 0 for the same).
+        if version_compare(local_pkgver, mpr_pkgver) < 0:
+            to_update += [package]
 
-		# Find array number for matching local package
-		number2 = 0
-		while number2 < local_packages_number:
+    # Print a warning for all installed MPR packages that couldn't be found.
+    if len(unknown_packages) != 0:
+        message("warning", "You currently have some packages installed from the MPR that were unable to be found.")
+        message("warning", "This probably means the package has been deleted, and you should make sure the packages listed below weren't deleted for any malicious reason:")
 
-			local_package_name = request_packages[number2].split('/')[0]
+        for i in unknown_packages:
+            message("warning2", i)
 
-			if local_package_name == rpc_package_name:
-				local_package_version = request_packages[number2].split('/')[1]
-				break
-
-			number2 = number2 + 1
-
-		if local_package_version != rpc_package_version:
-			to_update += [rpc_package_name]
-
-		number = number + 1
-
-	# Print a warning of out of date packages were found.
-	if outofdate_packages != []:
-		message("warning", "The following packages on your system are currently marked as out of date:")
-		for i in outofdate_packages:
-			message("warning2", f"{i[0]} ({i[1]})")
-
-	if len(to_update) == 0:
-		message("info", "No updates available.")
-		quit(0)
-
-	install_package(mpr_url, to_update, "upgraded", application_name, application_version, os_codename)
+    # Continue with updating packages if needed.
+    if len(to_update) == 0:
+        message("info", "No updates available.")
+    else:
+        install_package(mpr_url, to_update, "testing", application_name, application_version, os_codename)

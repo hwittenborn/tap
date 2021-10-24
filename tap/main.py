@@ -42,7 +42,10 @@ def main():
         install_package(mpr_url, packages, "installed", application_name, application_version, os_codename)
 
     elif operation == "update":
-        update_package(mpr_url, application_name, application_version, os_codename)
+        update_package(mpr_url=mpr_url,
+                       application_name=application_name,
+                       application_version=application_version,
+                       os_codename=os_codename)
 
     elif operation == "search":
         search_package(mpr_url=mpr_url,
