@@ -11,7 +11,6 @@ def search_package(**args):
     from  tap.colors                 import  colors                
     from  tap.message                import  message               
     from  tap.check_argument_option  import  check_argument_option 
-    from  tap.create_package_dict    import  create_package_dict
 
     mpr_url = args["mpr_url"]
     packages = args["packages"]
@@ -81,22 +80,22 @@ def search_package(**args):
             pkg_cache = apt_cache[pkgname]
 
             if pkg_cache.is_installed:
-                bracketed_text += ["Installed"]
+                bracketed_text += [f"{colors.cyan}Installed{colors.normal}"]
             if pkg_cache.is_auto_installed:
-                bracketed_text += ["Automatic"]
+                bracketed_text += [f"{colors.magenta}Automatic{colors.normal}"]
             
             # If the package is installed, check whether it was installed from the MPR or directly via APT.
-            if "Installed" in bracketed_text:
+            if pkg_cache.is_installed:
                 if pkgname in installed_mpr_packages:
-                    bracketed_text += ["MPR"]
+                    bracketed_text += [f"{colors.orange}MPR{colors.normal}"]
                 else:
-                    bracketed_text += ["APT"]
+                    bracketed_text += [f"{colors.orange}APT{colors.normal}"]
 
         except KeyError:
             pass
 
         if bracketed_text != []:
-            bracket_string = " [" + ", ".join(bracketed_text) + "]"
+            bracket_string = f" [" + ", ".join(bracketed_text) + f"]"
         else:
             bracket_string = ""
 

@@ -14,6 +14,8 @@ def update_package(**args):
     application_name = args["application_name"]
     application_version = args["application_version"]
     os_codename = args["os_codename"]
+    os_architecture = args["os_architecture"]
+    apt_cache = args["apt_cache"]
 
     # Get list of MPR packages on the user's system.
     mpr_packages = {}
@@ -75,4 +77,10 @@ def update_package(**args):
     if len(to_update) == 0:
         message("info", "No updates available.")
     else:
-        install_package(mpr_url, to_update, "testing", application_name, application_version, os_codename)
+        install_package(mpr_url=mpr_url,
+                        packages=to_update,
+                        application_name=application_name,
+                        application_version=application_version,
+                        os_codename=os_codename,
+                        os_architecture=os_architecture,
+                        apt_cache=apt_cache)

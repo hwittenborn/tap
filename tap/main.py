@@ -15,6 +15,7 @@ def main():
     from tap.search_package         import  search_package        
     from tap.list_packages          import  list_packages         
     from tap.message                import  message
+    from tap.run_loading_function   import  run_loading_function
 
 # Variables we need to function
     application_name = "tap"
@@ -23,6 +24,9 @@ def main():
     os_codename = subprocess.run(["lsb_release", "-cs"],
                                  stdout=subprocess.PIPE,
                                  universal_newlines=True).stdout.strip()
+    os_architecture = subprocess.run(["uname", "-m"],
+                                     stdout=subprocess.PIPE,
+                                     universal_newlines=True).stdout.strip()
 
     # Argument check
     argument_list = split_args(sys.argv[1:])
@@ -34,18 +38,26 @@ def main():
 
     # Generate APT cache if we're going to need it.
     if operation in ["install", "update", "search"]:
-        message("info", "Reading APT cache...")
-        apt_cache = apt.cache.Cache(None)
+        info_message = message("info", "Reading APT cache...", value_return=True)
+        apt_cache = run_loading_function(info_message, apt.cache.Cache, None)
 
     # Run commands
     if operation == "install":
-        install_package(mpr_url, packages, "installed", application_name, application_version, os_codename)
+        install_package(mpr_url=mpr_url,
+                packages=packages,
+                application_name=application_name,
+                application_version=application_version,
+                os_codename=os_codename,
+                os_architecture=os_architecture,
+                apt_cache=apt_cache)
 
     elif operation == "update":
         update_package(mpr_url=mpr_url,
                        application_name=application_name,
                        application_version=application_version,
-                       os_codename=os_codename)
+                       os_codename=os_codename,
+                       os_architecture=os_architecture,
+                       apt_cache=apt_cache)
 
     elif operation == "search":
         search_package(mpr_url=mpr_url,
