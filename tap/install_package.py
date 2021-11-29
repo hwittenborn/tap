@@ -70,6 +70,5 @@ def install_package():
     run_loading_function(msg, clone_packages)
     
     # Build dependency tree and install packages.
-    msg = message.info("Building dependency tree...", value_return=True, newline=False)
-    run_loading_function(msg, set_mpr_dependencies)
+    set_mpr_dependencies()
     run_transaction()

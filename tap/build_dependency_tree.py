@@ -6,8 +6,9 @@ from tap.exceptions import newline_error_exception
 from tap.split_dependency_string import split_dependency_string
 from tap.find_apt_package_version import find_apt_package_version
 from tap import cfg
+from tap.run_loading_function import run_loading_function
 
-def build_dependency_tree(**kwargs):
+def _build_dependency_tree(**kwargs):
     depends = kwargs["depends"]
     conflicts = kwargs["conflicts"]
     breaks = kwargs["breaks"]
@@ -38,7 +39,7 @@ def build_dependency_tree(**kwargs):
 
     for i in conflicts + breaks:
         try: cfg.apt_cache[i]
-        except KeyError: pass
+        except KeyError: continue
 
         curstate = cfg.apt_cache[i].current_state
         if curstate in (CURSTATE_CONFIG_FILES, CURSTATE_NOT_INSTALLED): continue
@@ -59,3 +60,7 @@ def build_dependency_tree(**kwargs):
         else:
             msg = message.error("An unknown error was encountered with building the dependency tree.", value_return=True)
             raise newline_error_exception(msg)
+
+def build_dependency_tree(*args, **kwargs):
+    msg = message.info("Building dependency tree...", newline=False, value_return=True)
+    run_loading_function(msg, _build_dependency_tree, *args, **kwargs)

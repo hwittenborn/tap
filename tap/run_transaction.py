@@ -12,8 +12,11 @@ from tap.generate_apt_styled_text import generate_apt_styled_text
 from tap.review_build_files import review_build_files
 from tap.parse_srcinfo import parse_srcinfo
 from tap.parse_control import parse_control
+from tap.build_dependency_tree import build_dependency_tree
 
-def run_transaction():
+def _install_apt_packages(**kwargs):
+    show_to_build = kwargs.get("show_to_build", True)
+
     to_apt_install = []
     to_upgrade = []
     to_downgrade = []
@@ -45,7 +48,8 @@ def run_transaction():
         exit(1)
 
     print(colors.bold)
-    generate_apt_styled_text("The following packages are going to be built:", cfg.mpr_packages)
+    if show_to_build: generate_apt_styled_text("The following packages are going to be built:", cfg.mpr_packages)
+
     generate_apt_styled_text("The following packages are going to be installed:", cfg.mpr_packages + to_apt_install)
     generate_apt_styled_text("The following packages are going to be upgraded:", to_upgrade)
     generate_apt_styled_text("The following packages are going to be DOWNGRADED:", to_downgrade)
@@ -58,8 +62,9 @@ def run_transaction():
     if response not in ("", "y"): exit(1)
 
     # Prompt the user to review build files.
-    review_build_files()
-    print()
+    if show_to_build:
+        review_build_files()
+        print()
 
     # Download and install archives.
     if to_apt_install != []:
@@ -80,6 +85,9 @@ def run_transaction():
             exit(1)
 
         print()
+
+def run_transaction():
+    _install_apt_packages()
 
     # Start building packages.
     message.info("Building packages...")
@@ -143,4 +151,26 @@ def run_transaction():
 
     # Install all the packages!
     message.info("Installing built packages...")
+    depends_list = []
+    conflicts_list = []
+    breaks_list = []
+
     chdir(f"/var/tmp/{cfg.application_name}/built_packages/")
+
+    for i in built_packages:
+        debfile = DebPackage(f"./{i}")
+        control = debfile.control_content("control")
+
+        control_info = parse_control(control)
+        depends_list += control_info.predepends + control_info.depends
+        conflicts_list += control_info.conflicts
+        breaks_list += control_info.breaks
+
+    build_dependency_tree(depends=depends_list, conflicts=conflicts_list, breaks=breaks_list)
+    _install_apt_packages(show_to_build=False)
+
+    for i in built_packages:
+        debfile = DebPackage(f"./{i}")
+        debfile.install()
+
+    message.info("Done.")
