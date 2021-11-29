@@ -1,78 +1,75 @@
-def install_package(**args):
-    from shutil import rmtree
-    from os.path import exists
-    from os import makedirs, chdir
-    from tap.get_editor_name import get_editor_name
-    from tap.make_mpr_request import make_mpr_request
-    from tap.message import message
-    from tap.create_mpr_json_dict import create_mpr_json_dict
-    from tap.build_dependency_tree import build_dependency_tree
-    from tap.clone_packages import clone_packages
-    from tap.builddir_del_error import builddir_del_error
-    from tap.run_loading_function import run_loading_function
+import sys
+import subprocess
 
-    mpr_url = args["mpr_url"]
-    packages = args["packages"]
-    application_name = args["application_name"]
-    application_version = args["application_version"]
-    os_codename = args["os_codename"]
-    os_architecture = args["os_architecture"]
-    apt_cache = args["apt_cache"]
-    builddir = "/var/tmp/tap/"
+from shutil import rmtree
+from subprocess import DEVNULL, PIPE
+from os.path import exists
+from os import makedirs, mkdir, chdir
+from time import sleep
+from tempfile import NamedTemporaryFile
+from tap.get_editor_name import get_editor_name
+from tap.make_mpr_request import make_mpr_request
+from tap.message import message
+from tap.create_mpr_json_dict import create_mpr_json_dict
+from tap.clone_packages import clone_packages
+from tap.builddir_del_error import builddir_del_error
+from tap.run_loading_function import run_loading_function
+from tap.colors import colors
+from tap.apt_fetch_packages import apt_fetch_packages
+from tap.apt_install_packages import apt_install_packages
+from tap import cfg
+from tap.read_cache import read_cache
+from tap.run_transaction import run_transaction
+from tap.set_mpr_dependencies import set_mpr_dependencies
 
-    # Get editor name.
-    editor_name = get_editor_name()
+def _create_build_dirs():
+    makedirs(f"/var/tmp/{cfg.application_name}/")
+    mkdir(f"/var/tmp/{cfg.application_name}/source_packages/")
+    mkdir(f"/var/tmp/{cfg.application_name}/built_packages/")
 
-    # Make MPR request.
-    json_data = make_mpr_request(packages, mpr_url, application_name, application_version)
-    json_data = create_mpr_json_dict(json_data)
+def install_package():
+    get_editor_name()
+    cfg.mpr_cache = read_cache()
 
     # Make sure all specified packages were able to be found.
-    if len(json_data) != len(packages):
-        missing_packages = []
+    missing_packages = []
 
-        for i in packages:
-            if i not in json_data.keys():
-                missing_packages += [i]
+    for i in cfg.mpr_packages:
+        if i not in cfg.mpr_cache.package_bases:
+            missing_packages += [i]
 
-        message("error", "The following packages couldn't be found:")
-
-        for i in missing_packages:
-            message("info2", i)
+    if missing_packages != []:
+        message.error("Couldn't find the following packages:")
+        for i in missing_packages: message.error2(i)
         exit(1)
 
     # If old build directory exists, delete it.
-    if exists(builddir):
+    build_dir = f"/var/tmp/{cfg.application_name}"
+    
+    if exists(build_dir):
         if rmtree.avoids_symlink_attacks != True:
-            message("error", "Old build directory exists, and Tap can't confirm if it can safely delete the build directory.")
-            message("error", f"Please check '{builddir}', and delete it yourself if you know it is safe to do so.")
+            message.error("Old build directory exists, and Tap can't confirm if it can safely delete the build directory.")
+            message.error(f"Please check '{build_dir}', and delete it yourself if you know it is safe to do so.")
             exit(1)
 
-        info_message = message("info", "Removing old build directory...", value_return=True)
-        run_loading_function(info_message, rmtree, builddir, onerror=builddir_del_error)
+        msg = message.info("Removing old build directory...", value_return=True, newline=False)
+        run_loading_function(msg, rmtree, build_dir, onerror=builddir_del_error)
 
     # Create the build directory.
-    info_message = message("info", "Creating build directory...", value_return=True)
+    msg = message.info("Creating build directory...", value_return=True, newline=False)
     
-    try: run_loading_function(info_message, makedirs, builddir)
+    try: run_loading_function(msg, _create_build_dirs)
     except PermissionError:
-        message("error", "Couldn't create the build directory.")
-        message("error", f"Make sure the parent directories of '{builddir}' are writable and try again.")
+        message.error("Couldn't create the build directory.")
+        message.error(f"Make sure the parent directories of '{build_dir}' are writable and try again.")
         exit(1)
     
     # Clone packages.
-    chdir(builddir)
-    info_message = message("info", "Cloning packages...", value_return=True)
-    failed_clones = run_loading_function(info_message, clone_packages, packages=packages, mpr_url=mpr_url)
+    chdir(build_dir)
+    msg = message.info("Cloning packages...", value_return=True, newline=False)
+    run_loading_function(msg, clone_packages)
     
-    if failed_clones != []:
-        message("error", "Some packages failed to clone:")
-
-        for i in failed_clones:
-            message("info2", i)
-
-        exit(1)
-
-    # Build dependency tree for packages.
-    info_message = message("info", "Building dependency tree...", value_return=True)
-    run_loading_function(info_message, build_dependency_tree, packages=packages, os_codename=os_codename, os_architecture=os_architecture)
+    # Build dependency tree and install packages.
+    msg = message.info("Building dependency tree...", value_return=True, newline=False)
+    run_loading_function(msg, set_mpr_dependencies)
+    run_transaction()

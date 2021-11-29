@@ -1,71 +1,47 @@
 #!/usr/bin/env python3
+import apt_pkg
+import os
+import sys
+import re
+import subprocess
+
+from tap.split_args import split_args            
+from tap.arg_check import arg_check             
+from tap.install_package import install_package       
+from tap.update_package import update_package        
+from tap.update import update
+from tap.search_package import search_package        
+from tap.list_packages import list_packages         
+from tap.message import message
+from tap.run_loading_function import run_loading_function
+from tap.check_bad_installed_packages import check_bad_installed_packages
+from tap.root_check import root_check
+from tap import cfg
+from tap.apt_fetch_packages import apt_fetch_packages
 
 def main():
-    # Modules
-    import apt
-    import os
-    import sys
-    import re
-    import subprocess
-
-    from tap.split_args             import  split_args            
-    from tap.arg_check              import  arg_check             
-    from tap.install_package        import  install_package       
-    from tap.update_package         import  update_package        
-    from tap.search_package         import  search_package        
-    from tap.list_packages          import  list_packages         
-    from tap.message                import  message
-    from tap.run_loading_function   import  run_loading_function
-
-# Variables we need to function
-    application_name = "tap"
-    application_version = os.environ.get("TAP_PKGVER", "git")
-    mpr_url = "mpr.hunterwittenborn.com"
-    os_codename = subprocess.run(["lsb_release", "-cs"],
-                                 stdout=subprocess.PIPE,
-                                 universal_newlines=True).stdout.strip()
-    os_architecture = subprocess.run(["uname", "-m"],
-                                     stdout=subprocess.PIPE,
-                                     universal_newlines=True).stdout.strip()
-
-    # Argument check
-    argument_list = split_args(sys.argv[1:])
-    arg_check_results = arg_check(argument_list, application_name, application_version)
-
-    operation = arg_check_results[0]
-    packages = arg_check_results[1]
-    argument_options = arg_check_results[2]
+    arg_check()
+    
+    if cfg.operation in cfg.requires_sudo:
+        root_check()
 
     # Generate APT cache if we're going to need it.
-    if operation in ["install", "update", "search"]:
-        info_message = message("info", "Reading APT cache...", value_return=True)
-        apt_cache = run_loading_function(info_message, apt.cache.Cache, None)
+    if cfg.operation in cfg.requires_apt_cache:
+        apt_pkg.init()
 
-    # Run commands
-    if operation == "install":
-        install_package(mpr_url=mpr_url,
-                packages=packages,
-                application_name=application_name,
-                application_version=application_version,
-                os_codename=os_codename,
-                os_architecture=os_architecture,
-                apt_cache=apt_cache)
+        info_message = message.info("Reading APT cache...", value_return=True, newline=False)
+        cfg.apt_cache = run_loading_function(info_message, apt_pkg.Cache, None)
+        cfg.apt_depcache = apt_pkg.DepCache(cfg.apt_cache)
+        cfg.apt_resolver = apt_pkg.ProblemResolver(cfg.apt_depcache)
+        cfg.apt_pkgman = apt_pkg.PackageManager(cfg.apt_depcache)
+        cfg.apt_acquire = apt_pkg.Acquire(apt_fetch_packages())
+        cfg.apt_sourcelist = apt_pkg.SourceList()
+        cfg.apt_sourcelist.read_main_list()
+        cfg.apt_pkgrecords = apt_pkg.PackageRecords(cfg.apt_cache)
 
-    elif operation == "update":
-        update_package(mpr_url=mpr_url,
-                       application_name=application_name,
-                       application_version=application_version,
-                       os_codename=os_codename,
-                       os_architecture=os_architecture,
-                       apt_cache=apt_cache)
-
-    elif operation == "search":
-        search_package(mpr_url=mpr_url,
-                       packages=packages,
-                       application_name=application_name,
-                       application_version=application_version,
-                       argument_options=argument_options,
-                       apt_cache=apt_cache)
-
-    elif operation == "list-packages":
-        list_packages(argument_options)
+    # Run commands.
+    if cfg.operation == "install": install_package()
+    elif cfg.operation == "update": update()
+    elif cfg.operation == "upgrade": update_package()
+    elif cfg.operation == "search": search_package()
+    elif cfg.operation == "list-packages": list_packages()

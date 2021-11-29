@@ -16,6 +16,8 @@ def update_package(**args):
     os_codename = args["os_codename"]
     os_architecture = args["os_architecture"]
     apt_cache = args["apt_cache"]
+    apt_depcache = args["apt_depcache"]
+    apt_pkgman = args["apt_pkgman"]
 
     # Get list of MPR packages on the user's system.
     mpr_packages = {}
@@ -83,4 +85,6 @@ def update_package(**args):
                         application_version=application_version,
                         os_codename=os_codename,
                         os_architecture=os_architecture,
-                        apt_cache=apt_cache)
+                        apt_cache=apt_cache,
+                        apt_depcache=apt_depcache,
+                        apt_pkgman=apt_pkgman)

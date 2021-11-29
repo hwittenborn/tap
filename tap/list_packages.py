@@ -1,76 +1,57 @@
-def list_packages(argument_options):
-	import os
-	import re
+def list_packages(**args):
+    import os
+    import subprocess
 
-	from tap.colors import  colors
-	from tap.check_argument_option import check_argument_option
+    from tap.colors import colors
+    from apt_pkg import TagFile
+    from tap.message import message
+    from tap.create_dpkg_status_dict import create_dpkg_status_dict
 
-	# We use triple forward-slashes in case a package's description were to ever
-	# include a forward slash. While the triple-slash method isn't full-proof,
-	# it will work for all packages where three slashes in a row aren't present.
-	#
-	# We also prefix dpkg's output with three forward-slashes so we can remove
-	# any lines that don't start with it (following the above note, it will
-	# only happen on multi-lined descriptions).
-	dpkg_package_list_raw = os.popen("dpkg-query --show --showformat '///${Package}///${MPR-Package}///${Version}///${Description}///${Maintainer}\n'").read().splitlines()
+    argument_options = args["argument_options"]
+    apt_cache = args["apt_cache"]
 
-	number = 0
-	mpr_package_info = []
+    mpr_packages = []
+    installed_packages = create_dpkg_status_dict()
 
-	for i in dpkg_package_list_raw:
-		is_mpr_package = re.search('^///[^/]*///[^/].*', i)
+    for i in installed_packages.keys():
+        current_dict = installed_packages[i]
 
-		if is_mpr_package != None:
+        if current_dict.get("MPR-Package") is not None:
+            mpr_packages += [current_dict["Package"]]
 
-			number = number + 1
-			mpr_package_info += [is_mpr_package.group(0).split('///')]
+    if mpr_packages == []:
+        message("info", "No MPR packages currently installed.")
+        exit(0)
 
-	if check_argument_option(argument_options, "rev-alpha") == True:
-		mpr_package_info = sorted(mpr_package_info, reverse=True)
+    mpr_packages.sort()
 
-	else:
-		mpr_package_info = sorted(mpr_package_info)
+    if "--rev-alpha" in argument_options:
+        mpr_packages.reverse()
 
-	if number > 0:
+    results_string = ""
 
-		list_packages_output_temp = ""
-		number_counter = 0
+    num_mpr_packages = len(mpr_packages) - 1
+    number = 0
 
-		for i in mpr_package_info:
+    for i in mpr_packages:
+        current_dict = installed_packages[i]
 
-			list_packages_output_temp += f"{colors.apt_green}{i[1]}{colors.white}/{i[3]}\n"
-			list_packages_output_temp += f"  From: {i[2]}\n"
-			list_packages_output_temp += f"  Description: {i[4]}\n"
-			list_packages_output_temp += f"  Maintainer: {i[5]}\n"
+        pkgbase = current_dict["MPR-Package"]
+        pkgname = current_dict["Package"]
+        pkgver = current_dict["Version"]
+        pkgdesc = current_dict.get("Description", "N/A")
+        maintainer = current_dict.get("Maintainer", "N/A")
 
-			list_packages_output_temp += "\n"
+        results_string += f"{colors.apt_green}{pkgname}{colors.normal}/{pkgver}\n"
+        results_string += f"From: {pkgbase}\n"
+        results_string += f"Description: {pkgdesc}\n"
+        results_string += f"Maintainer: {maintainer}\n"
 
-			number_counter = number_counter + 1
+        if number < num_mpr_packages:
+            results_string += "\n"
 
-		# Remove trailing newlines
-		list_packages_output = list_packages_output_temp.strip()
-
-		# Get height of terminal and number of lines in package output
-		terminal_height = os.get_terminal_size()[1]
-		list_packages_output_lines = list_packages_output.count('\n')
-
-		# Pipe output into 'less' if output is greater than terminal height
-		# so we don't flood the user's terminal with text.
-		#
-		# Also add a header at the top so the user knows where they're at.
-		#
-		# This gets ignored when the '--skip-less-pipe' option is passed.
-		if list_packages_output_lines > terminal_height and check_argument_option(argument_options, "no-less-pipe") == False:
-
-			# Define header
-			less_header =  "==================================\n"
-			less_header += "Installed MPR Packages\n"
-			less_header += "Press / to search\n"
-			less_header += "Press q to return to your terminal\n"
-			less_header += "==================================\n\n"
-
-			# Print output
-			os.system(f"printf '{less_header}{list_packages_output}' | less -r")
-
-		else:
-			print(list_packages_output)
+        number = number + 1
+    if (len(results_string.splitlines()) > os.get_terminal_size().lines) and ("no-less-pipe" not in argument_options):
+        subprocess.run(["less", "-r"], input=results_string.encode())
+    else:
+        print(results_string, end="")

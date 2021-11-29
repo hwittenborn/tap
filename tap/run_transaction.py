@@ -1,0 +1,146 @@
+import subprocess
+
+from os import chdir, mkdir
+from shutil import copy2
+from time import sleep
+from subprocess import PIPE
+from apt.debfile import DebPackage
+from tap import cfg
+from tap.message import message
+from tap.colors import colors
+from tap.generate_apt_styled_text import generate_apt_styled_text
+from tap.review_build_files import review_build_files
+from tap.parse_srcinfo import parse_srcinfo
+from tap.parse_control import parse_control
+
+def run_transaction():
+    to_apt_install = []
+    to_upgrade = []
+    to_downgrade = []
+    to_remove = []
+    to_remove_essential = []
+    
+    for i in cfg.apt_cache.packages:
+        if cfg.apt_depcache.marked_install(i):
+            to_apt_install += [i.name]
+        
+        elif cfg.apt_depcache.marked_upgrade(i):
+            to_upgrade += [i.name]
+        
+        elif cfg.apt_depcache.marked_downgrade(i):
+            to_downgrade += [i.name]
+        
+        elif cfg.apt_depcache.marked_delete(i):
+            to_remove += [i.name]
+            if i.essential: to_remove_essential += [i.name]
+    
+    for i in [to_apt_install, to_upgrade, to_downgrade, to_remove]:
+        i.sort()
+    
+    # Abort transaction if we would remove essential packages in the process.
+    # TODO: Allow this to happen, albeit by many alerting prompts to make sure the user really wants to do it.
+    if to_remove_essential != []:
+        message.error("Refusing to complete transaction, as the following essential packages would be removed:")
+        for i in to_remove_essential: message.error2(i)
+        exit(1)
+
+    print(colors.bold)
+    generate_apt_styled_text("The following packages are going to be built:", cfg.mpr_packages)
+    generate_apt_styled_text("The following packages are going to be installed:", cfg.mpr_packages + to_apt_install)
+    generate_apt_styled_text("The following packages are going to be upgraded:", to_upgrade)
+    generate_apt_styled_text("The following packages are going to be DOWNGRADED:", to_downgrade)
+    generate_apt_styled_text("The following packages are going to be REMOVED:", to_remove)
+    print(colors.normal)
+
+    msg = message.question("Would you like to continue? [Y/n] ", value_return=True, newline=False)
+    response = input(msg).lower()
+
+    if response not in ("", "y"): exit(1)
+
+    # Prompt the user to review build files.
+    review_build_files()
+    print()
+
+    # Download and install archives.
+    if to_apt_install != []:
+        cfg.apt_pkgman.get_archives(cfg.apt_acquire, cfg.apt_sourcelist, cfg.apt_pkgrecords)
+        cfg.apt_acquire.run()
+
+        if cfg.failed_downloads != []:
+            pass
+            message.error("Some packages failed to download:")
+            for i in cfg.failed_downloads: message.error2(i)
+
+        message.info("Installing packages...")
+        with open("/dev/null", "w") as file:
+            result = cfg.apt_pkgman.do_install(file.fileno())
+
+        if result == cfg.apt_pkgman.RESULT_FAILED:
+            message.error("Failed installing packages.")
+            exit(1)
+
+        print()
+
+    # Start building packages.
+    message.info("Building packages...")
+    failed_builds = []
+    built_packages = []
+
+    for pkgbase in cfg.mpr_packages:
+        chdir(f"/var/tmp/{cfg.application_name}/source_packages/{pkgbase}/")
+        
+        pkginfo = parse_srcinfo(".SRCINFO")
+        pkgname = pkginfo.pkgname
+        version = pkginfo.version
+        arch = pkginfo.arch
+        mpr_package_field = False
+
+        # We have to check for the 'MPR-Package' control field by sourcing the PKGBUILD right now, as makedeb doesn't currently export that field into SRCINFO files.
+        control_fields = subprocess.run(["bash", "-c", "source PKGBUILD; printf '%s' \"${control_fields[@]}\""], stdout=PIPE).stdout.decode().splitlines()
+
+        if control_fields != []:
+            for field in control_fields:
+                args = field.split(": ")
+                
+                if args[0] == "MPR-Package":
+                    mpr_package_field = True
+                    break
+
+        # Actually build the package.
+        additional_args = []
+
+        if not mpr_package_field:
+            additional_args = ["-H", f"MPR-Package: {pkgbase}"]
+
+        proc = subprocess.run(["sudo", "-nu", f"#{cfg.build_user}", "--", "makedeb"] + additional_args)
+
+        if proc.returncode != 0:
+            message.error(f"Package '{pkgbase}' failed to build.")
+            msg = message.question("Would you like to abort the build process? "
+                                   "This will result in all packages marked for building not being installed. [Y/n] ",
+                                   newline=False,
+                                   value_return=True)
+            
+            response = input(msg).lower()
+
+            if response != "n":
+                message.error("Aborting...")
+                exit(1)
+            
+            else:
+                message.info("Continuing with builds...")
+        
+        # Copy built packages to temp directory for installation later.
+        for name in pkgname:
+            with open(f"./pkg/{name}/DEBIAN/control", "r") as file:
+                control_info = parse_control(file.read())
+                version = control_info.version
+                arch = control_info.arch
+            
+            filename = f"{name}_{version}_{arch}.deb"
+            built_packages += [filename]
+            copy2(f"./{filename}", f"/var/tmp/{cfg.application_name}/built_packages/{filename}")
+
+    # Install all the packages!
+    message.info("Installing built packages...")
+    chdir(f"/var/tmp/{cfg.application_name}/built_packages/")

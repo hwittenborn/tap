@@ -1,5 +1,7 @@
 # Credits to @vyashole (GitHub) for the idea to implement this.
 # See 'https://github.com/hwittenborn/tap/issues/2' for more info.
+from tap import cfg
+
 def get_editor_name():
     from os import environ as env
     from shutil import which
@@ -24,4 +26,4 @@ def get_editor_name():
         message("error", f"Couldn't find editor '{editor_name}'.")
         quit(1)
 
-    return editor_name
+    cfg.editor_name = editor_name
