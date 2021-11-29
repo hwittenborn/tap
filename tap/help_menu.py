@@ -9,6 +9,7 @@ def help_menu(**args):
     print("  install                 Install packages")
     print("  update                  Update local repository caches")
     print("  upgrade                 Upgrade currently installed packages")
+    print("  remove                  Remove installed packages")
     print("  search                  Search for packages")
     print("  list-packages           List installed packages built from the MPR")
     print()

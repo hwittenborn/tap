@@ -54,7 +54,17 @@ def _install_apt_packages(**kwargs):
     generate_apt_styled_text("The following packages are going to be upgraded:", to_upgrade)
     generate_apt_styled_text("The following packages are going to be DOWNGRADED:", to_downgrade)
     generate_apt_styled_text("The following packages are going to be REMOVED:", to_remove)
-    print(colors.normal)
+
+    len_to_install = len(cfg.mpr_packages + to_apt_install)
+    len_to_upgrade = len(to_upgrade)
+    len_to_downgrade = len(to_downgrade)
+    len_to_remove = len(to_remove)
+
+    print(f"{len_to_install} to install, {len_to_upgrade} to upgrade, {len_to_downgrade} to downgrade, and {len_to_remove} to remove.")
+    print(f"{colors.normal}", end="")
+
+    if (len_to_install + len_to_upgrade + len_to_downgrade + len_to_remove) == 0:
+        exit(0)
 
     msg = message.question("Would you like to continue? [Y/n] ", value_return=True, newline=False)
     response = input(msg).lower()
@@ -67,7 +77,7 @@ def _install_apt_packages(**kwargs):
         print()
 
     # Download and install archives.
-    if to_apt_install != []:
+    if (to_apt_install != []) or (to_upgrade != []) or (to_downgrade != []) or (to_remove != []):
         cfg.apt_pkgman.get_archives(cfg.apt_acquire, cfg.apt_sourcelist, cfg.apt_pkgrecords)
         cfg.apt_acquire.run()
 
@@ -76,7 +86,7 @@ def _install_apt_packages(**kwargs):
             message.error("Some packages failed to download:")
             for i in cfg.failed_downloads: message.error2(i)
 
-        message.info("Installing packages...")
+        message.info("Setting up APT packages...")
         with open("/dev/null", "w") as file:
             result = cfg.apt_pkgman.do_install(file.fileno())
 

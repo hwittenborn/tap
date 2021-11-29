@@ -16,7 +16,7 @@ def search_package():
     # Make and verify request to MPR.
     request_arguments = ""
 
-    for i in cfg.packages:
+    for i in cfg.mpr_packages:
         request_arguments += i
 
     try: mpr_rpc_request = requests.get(f"https://{cfg.mpr_url}/rpc/?v=5&type=search&arg={request_arguments}", headers={"User-Agent": f"{cfg.application_name}/{cfg.application_version}"})

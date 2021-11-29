@@ -20,10 +20,10 @@ options = []
 unknown_options = []
 build_user = None
 
-available_commands = ["install", "update", "upgrade", "search", "list-packages"]
-requires_arguments = ["install", "search"]
-requires_sudo = ["install", "update", "upgrade"]
-requires_apt_cache = ["install", "upgrade", "search", "list-packages"]
+available_commands = ["install", "update", "upgrade", "remove", "search", "list-packages"]
+requires_arguments = ["install", "remove", "search"]
+requires_sudo = ["install", "update", "upgrade", "remove"]
+requires_apt_cache = ["install", "upgrade", "remove", "search", "list-packages"]
 
 # Caches used for package installation.
 apt_cache = None

@@ -18,6 +18,7 @@ from tap.check_bad_installed_packages import check_bad_installed_packages
 from tap.root_check import root_check
 from tap import cfg
 from tap.apt_fetch_packages import apt_fetch_packages
+from tap.remove import remove
 
 def main():
     arg_check()
@@ -43,5 +44,6 @@ def main():
     if cfg.operation == "install": install_package()
     elif cfg.operation == "update": update()
     elif cfg.operation == "upgrade": update_package()
+    elif cfg.operation == "remove": remove()
     elif cfg.operation == "search": search_package()
     elif cfg.operation == "list-packages": list_packages()
