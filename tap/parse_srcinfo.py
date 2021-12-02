@@ -1,6 +1,7 @@
-from tap.message import message
-from tap.exceptions import newline_error_exception
 from tap import cfg
+from tap.exceptions import newline_error_exception
+from tap.message import message
+
 
 class _srcinfo_class:
     def __init__(self, srcinfo_dict):
@@ -25,6 +26,7 @@ class _srcinfo_class:
         # Extras.
         self.version = f"{self.pkgver}-{self.pkgrel}"
 
+
 def parse_srcinfo(path):
     # Read file.
     try:
@@ -37,27 +39,32 @@ def parse_srcinfo(path):
         raise newline_error_exception(error_message)
 
     except PermissionError:
-        error_message = message.error(f"Insufficient permissions to read '{path}'.", value_return=True)
+        error_message = message.error(
+            f"Insufficient permissions to read '{path}'.", value_return=True
+        )
         raise newline_error_exception(error_message)
-    
+
     # Parse file.
     current_dict = {}
 
     for i in data.splitlines():
-        if i == "": continue
+        if i == "":
+            continue
         i = i.lstrip("\t")
 
         args = i.split(" = ")
         key = args[0]
-        
+
         try:
             value = " = ".join(args[1:])
         except IndexError:
             message.error("Error parsing SRCINFO file under '{path}'.")
             exit(1)
-        
-        try: current_dict[key] += [value]
-        except KeyError: current_dict[key] = [value]
+
+        try:
+            current_dict[key] += [value]
+        except KeyError:
+            current_dict[key] = [value]
 
     # Verify data.
     bad_file = False
@@ -70,26 +77,46 @@ def parse_srcinfo(path):
             bad_file = True
 
     for i in cfg.srcinfo_single_keys:
-        try: current_dict[i]
-        except KeyError: continue
+        try:
+            current_dict[i]
+        except KeyError:
+            continue
 
         if len(current_dict[i]) > 1:
-            message.error(f"Duplicate entries found for '{i}' in SRCINFO file under '{path}'.")
+            message.error(
+                f"Duplicate entries found for '{i}' in SRCINFO file under '{path}'."
+            )
             bad_file = True
 
-    if bad_file: exit(1)
+    if bad_file:
+        exit(1)
 
     # Parse distro dependencies properly.
-    for dependency in ["depends", "makedepends", "checkdepends", "optdepends", "conflicts", "breaks", "provides", "replaces"]:
-        for target in [f"{cfg.os_codename}_{dependency}_{cfg.os_architecture}", f"{cfg.os_codename}_{dependency}", f"{dependency}_{cfg.os_architecture}"]:
+    for dependency in [
+        "depends",
+        "makedepends",
+        "checkdepends",
+        "optdepends",
+        "conflicts",
+        "breaks",
+        "provides",
+        "replaces",
+    ]:
+        for target in [
+            f"{cfg.os_codename}_{dependency}_{cfg.os_architecture}",
+            f"{cfg.os_codename}_{dependency}",
+            f"{dependency}_{cfg.os_architecture}",
+        ]:
             if current_dict.get(target) is not None:
                 current_dict[dependency] = current_dict[target]
                 break
 
     # Return an object for the SRCINFO data.
     for i in cfg.srcinfo_single_keys:
-        try: current_dict[i]
-        except KeyError: continue
+        try:
+            current_dict[i]
+        except KeyError:
+            continue
         current_dict[i] = current_dict[i][0]
 
     return _srcinfo_class(current_dict)

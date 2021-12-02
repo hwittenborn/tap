@@ -8,22 +8,27 @@ application_version = application_version = environ.get("TAP_PKGVER", "git")
 application_description = "MPR in your pocket"
 called_program = argv[0]
 mpr_url = "mpr.hunterwittenborn.com"
-os_codename = subprocess.run(["lsb_release", "-cs"], stdout=subprocess.PIPE, universal_newlines=True).stdout.strip()
-os_architecture = subprocess.run(["uname", "-m"], stdout=subprocess.PIPE, universal_newlines=True).stdout.strip()
+os_codename = subprocess.run(
+    ["lsb_release", "-cs"], stdout=subprocess.PIPE, universal_newlines=True
+).stdout.strip()
+os_architecture = subprocess.run(
+    ["uname", "-m"], stdout=subprocess.PIPE, universal_newlines=True
+).stdout.strip()
 editor_name = None
 
 # Information on current transaction.
 operation = None
+packages = []
 apt_packages = []
 mpr_packages = []
 options = []
 unknown_options = []
 build_user = None
 
-available_commands = ["install", "update", "upgrade", "remove", "search", "list-packages"]
+available_commands = ["install", "update", "remove", "search"]
 requires_arguments = ["install", "remove", "search"]
-requires_sudo = ["install", "update", "upgrade", "remove"]
-requires_apt_cache = ["install", "upgrade", "remove", "search", "list-packages"]
+requires_sudo = ["install", "update", "remove"]
+requires_apt_cache = ["install", "upgrade", "remove", "search"]
 
 # Caches used for package installation.
 apt_cache = None

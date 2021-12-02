@@ -1,4 +1,5 @@
-comparison_operators = [">=", "<=", ">", "<", "="] 
+comparison_operators = [">=", "<=", ">", "<", "="]
+
 
 class split_dependency_string:
     def __init__(self, string):

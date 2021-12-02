@@ -1,7 +1,14 @@
-def find_apt_package_version(package_object, operator, specified_version):
-    from apt_pkg import version_compare, CURSTATE_INSTALLED, CURSTATE_NOT_INSTALLED, CURSTATE_CONFIG_FILES
-    from operator import ge, le, gt, lt, eq
+from operator import eq, ge, gt, le, lt
 
+from apt_pkg import (
+    CURSTATE_CONFIG_FILES,
+    CURSTATE_INSTALLED,
+    CURSTATE_NOT_INSTALLED,
+    version_compare,
+)
+
+
+def find_apt_package_version(package_object, operator, specified_version):
     version_state = "UNFINDABLE_VERSION"
     versions = []
 
@@ -12,7 +19,7 @@ def find_apt_package_version(package_object, operator, specified_version):
     if inst_state == CURSTATE_INSTALLED:
         package_installed = True
         installed_version = package_object.current_ver.ver_str
-    
+
     elif inst_state in [CURSTATE_NOT_INSTALLED, CURSTATE_CONFIG_FILES]:
         package_installed = False
 

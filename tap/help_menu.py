@@ -1,5 +1,6 @@
 from tap import cfg
 
+
 def help_menu(**args):
     print(f"{cfg.application_name} {cfg.application_version} - MPR in your pocket")
     print()
@@ -16,11 +17,17 @@ def help_menu(**args):
     print("Options:")
     print("  -e, --min-info          Print extra information when using 'search'")
     print("  -h, --help              Bring up this help menu")
-    print("  -L, --skip-less-pipe    Don't pipe output from 'list-packages' into 'less' when output is taller than the terminal height")
-    print("  -R, --rev-alpha         Sort results from 'search' and 'list-packages' from Z-A instead of A-Z")
+    print(
+        "  -L, --skip-less-pipe    Don't pipe output from 'list-packages' into 'less' when output is taller than the terminal height"
+    )
+    print(
+        "  -R, --rev-alpha         Sort results from 'search' and 'list-packages' from Z-A instead of A-Z"
+    )
     print("  -V, --version           Print version information and exit")
     print()
-    print(f"See {cfg.application_name}(8) for more information on usage and links for support.")
+    print(
+        f"See {cfg.application_name}(8) for more information on usage and links for support."
+    )
 
     if args.get("exit", True):
         exit(0)

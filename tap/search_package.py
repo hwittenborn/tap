@@ -1,30 +1,38 @@
+import json
+import os
+import subprocess
+from datetime import datetime
+
+import requests
+from tap import cfg
+from tap.colors import colors
+from tap.message import message
+
+from apt_pkg import INSTSTATE_OK, TagFile
+
+
 def search_package():
-    import apt
-    import requests
-    import json
-    import os
-    import re
-    import subprocess
-
-    from apt_pkg import TagFile, INSTSTATE_OK
-    from datetime import datetime
-    from tap.colors import colors
-    from tap.message import message
-    from tap.check_argument_option import check_argument_option
-    from tap import cfg
-
     # Make and verify request to MPR.
-    request_arguments = ""
+    request_args = ""
 
     for i in cfg.mpr_packages:
-        request_arguments += i
+        request_args += i
 
-    try: mpr_rpc_request = requests.get(f"https://{cfg.mpr_url}/rpc/?v=5&type=search&arg={request_arguments}", headers={"User-Agent": f"{cfg.application_name}/{cfg.application_version}"})
+    try:
+        mpr_rpc_request = requests.get(
+            f"https://{cfg.mpr_url}/rpc/?v=5&type=search&arg={request_args}",
+            headers={
+                "User-Agent": "{}/{}".format(
+                    cfg.application_name, cfg.application_version
+                )
+            },
+        )
     except requests.exceptions.ConnectionError:
         message.error("Failed to make request to MPR.")
         quit(1)
 
-    try: mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
+    try:
+        mpr_rpc_json_data = json.loads(mpr_rpc_request.text)
     except json.decoder.JSONDecodeError:
         message.error("There was an error processing your request.")
         quit(1)
@@ -77,8 +85,9 @@ def search_package():
                 bracketed_text += [f"{colors.cyan}Installed{colors.normal}"]
             if cfg.apt_depcache.is_auto_installed(pkg_cache):
                 bracketed_text += [f"{colors.magenta}Automatic{colors.normal}"]
-            
-            # If the package is installed, check whether it was installed from the MPR or directly via APT.
+
+            # If the package is installed, check whether it was installed from
+            # the MPR or via APT.
             if pkg_installed:
                 if pkgname in installed_mpr_packages:
                     bracketed_text += [f"{colors.orange}MPR{colors.normal}"]
@@ -94,7 +103,11 @@ def search_package():
             bracket_string = ""
 
         # Actually generate results text.
-        results_string += f"{colors.apt_green}{pkgname}{colors.white}/{pkgver}{bracket_string}\n"
+        results_string += (
+            f"{colors.apt_green}{pkgname}{colors.white}"
+            "/"
+            f"{pkgver}{bracket_string}\n"
+        )
         results_string += f"  Description: {pkgdesc}\n"
         results_string += f"  Maintainer: {maintainer}\n"
         results_string += f"  Votes: {votes}\n"
@@ -103,10 +116,12 @@ def search_package():
 
         if number < result_count:
             results_string += "\n"
-        
+
         number = number + 1
 
-    if (len(results_string.splitlines()) > os.get_terminal_size().lines) and ("--skip-less-pipe" not in cfg.options):
+    if (len(results_string.splitlines()) > os.get_terminal_size().lines) and (
+        "--skip-less-pipe" not in cfg.options
+    ):
         subprocess.run(["less", "-r"], input=results_string.encode())
     else:
         print(results_string, end="")

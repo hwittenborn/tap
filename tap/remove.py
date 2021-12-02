@@ -1,14 +1,19 @@
-import apt_pkg
-
-from apt_pkg import CURSTATE_INSTALLED, CURSTATE_HALF_INSTALLED, CURSTATE_HALF_CONFIGURED, CURSTATE_UNPACKED
 from tap import cfg
-from tap.run_transaction import _install_apt_packages
 from tap.message import message
+from tap.run_transaction import _install_apt_packages
+
+from apt_pkg import (
+    CURSTATE_HALF_CONFIGURED,
+    CURSTATE_HALF_INSTALLED,
+    CURSTATE_INSTALLED,
+    CURSTATE_UNPACKED,
+)
+
 
 def remove():
     cfg.apt_packages = cfg.mpr_packages
     cfg.mpr_packages = []
-    
+
     not_installed = []
 
     for i in cfg.apt_packages:
@@ -18,7 +23,12 @@ def remove():
             not_installed += [i]
             continue
 
-        if cfg.apt_cache[i].current_state in (CURSTATE_INSTALLED, CURSTATE_HALF_INSTALLED, CURSTATE_HALF_CONFIGURED, CURSTATE_UNPACKED):
+        if cfg.apt_cache[i].current_state in (
+            CURSTATE_INSTALLED,
+            CURSTATE_HALF_INSTALLED,
+            CURSTATE_HALF_CONFIGURED,
+            CURSTATE_UNPACKED,
+        ):
             cfg.apt_depcache.mark_delete(cfg.apt_cache[i])
             cfg.apt_resolver.protect(cfg.apt_cache[i])
         else:

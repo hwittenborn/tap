@@ -2,6 +2,7 @@
 # See 'https://github.com/hwittenborn/tap/issues/2' for more info.
 from tap import cfg
 
+
 def get_editor_name():
     from os import environ as env
     from shutil import which
@@ -13,12 +14,12 @@ def get_editor_name():
     # even if $EDITOR is set.
     editor_name = None
 
-    for i in ['EDITOR', 'VISUAL']:
+    for i in ["EDITOR", "VISUAL"]:
         value = env.get(i)
-        
+
         if value is not None:
             editor_name = value
-    
+
     if editor_name is None:
         editor_name = "/usr/bin/editor"
 

@@ -1,8 +1,9 @@
 import json
-
 from os.path import exists
+
 from tap import cfg
 from tap.message import message
+
 
 class _create_pkg_object:
     def __init__(self, json_dict):
@@ -21,6 +22,7 @@ class _create_pkg_object:
         self.license = json_dict["License"]
         self.keywords = json_dict["Keywords"]
 
+
 class read_cache:
     def __init__(self):
         filename = f"/var/cache/{cfg.application_name}/mpr-cache.json"
@@ -32,7 +34,7 @@ class read_cache:
 
         with open(filename, "r") as file:
             data = file.read()
-        
+
         try:
             data = json.loads(data)
         except json.decoder.JSONDecodeError:
