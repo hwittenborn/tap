@@ -25,10 +25,45 @@ options = []
 unknown_options = []
 build_user = None
 
-available_commands = ["install", "update", "remove", "search"]
+available_commands = {
+    "install": "Install packages",
+    "update": "Update local repository caches",
+    "remove": "Remove installed packages",
+    "search": "Search for packages"
+}
+
 requires_arguments = ["install", "remove", "search"]
 requires_sudo = ["install", "update", "remove"]
 requires_apt_cache = ["install", "upgrade", "remove", "search"]
+requires_mpr_cache = ["install", "upgrade", "search"]
+
+# Information on commands.
+install_options = {}
+update_options = {}
+remove_options = {}
+search_options = {
+    "--help": "Bring up this help menu",
+    "--rev-alpha": "Sort package results from Z-A instead of A-Z",
+    "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
+    "--apt-only": "Only show packages available via APT",
+    "--mpr-only": "Only show packages available in the MPR"
+}
+
+install_shortopts = {}
+update_shortopts = {}
+remove_shortopts = {}
+search_shortopts = {
+    "-h": "--help",
+    "-L": "--skip-less-pipe",
+    "-R": "--rev-alpha"
+}
+
+command_options = {
+    "install": (install_options, install_shortopts),
+    "update": (update_options, update_shortopts),
+    "remove": (remove_options, remove_shortopts),
+    "search": (search_options, search_shortopts)
+}
 
 # Caches used for package installation.
 apt_cache = None

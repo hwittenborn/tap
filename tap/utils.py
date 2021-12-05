@@ -1,8 +1,8 @@
 from tap.colors import colors
 from tap.exceptions import UnknownPackage
 from tap.message import message
-
-from apt_pkg import TagFile
+from tap import cfg
+from apt_pkg import TagFile, CURSTATE_INSTALLED
 
 
 def _is_integer(arg):
@@ -13,22 +13,23 @@ def _is_integer(arg):
         return False
 
 
-def from_mpr(pkgname):
-    with TagFile("/var/lib/dpkg/status") as tagfile:
-        requested_package = None
+def is_installed(pkgname):
+    installed = False
 
-        for section in tagfile:
-            if section["Package"] == pkgname:
-                requested_pacakge = section
-                break
-
-    # Only installed packages are in /var/lib/dpkg/status, so not finding it infers it's not installed from the MPR.
     try:
-        requested_package["MPR-Package"]
-        return True
-    except (KeyError, TypeError):
+        if cfg.apt_cache[pkgname].current_state == CURSTATE_INSTALLED: installed = True
+    except KeyError: installed = False
+
+    if not installed:
         return False
 
+    with TagFile("/var/lib/dpkg/status") as file:
+        for section in file:
+            if section["Package"] == pkgname:
+                try:
+                    section["MPR-Package"]
+                    return "mpr"
+                except KeyError: return "apt"
 
 def get_user_selection(question, options, **kwargs):
     msg2_function = kwargs["msg2_function"]

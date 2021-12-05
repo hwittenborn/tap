@@ -7,9 +7,9 @@ from tap.message import message
 from tap.remove import remove
 from tap.root_check import root_check
 from tap.run_loading_function import run_loading_function
-from tap.search_package import search_package
 from tap.update import update
-
+from tap.read_mpr_cache import read_mpr_cache
+from tap.search import search
 import apt_pkg
 
 
@@ -23,10 +23,8 @@ def main():
     if cfg.operation in cfg.requires_apt_cache:
         apt_pkg.init()
 
-        info_message = message.info(
-            "Reading APT cache...", value_return=True, newline=False
-        )
-        cfg.apt_cache = run_loading_function(info_message, apt_pkg.Cache, None)
+        msg = message.info("Reading APT cache...", value_return=True, newline=False)
+        cfg.apt_cache = run_loading_function(msg, apt_pkg.Cache, None)
         cfg.apt_depcache = apt_pkg.DepCache(cfg.apt_cache)
         cfg.apt_resolver = apt_pkg.ProblemResolver(cfg.apt_depcache)
         cfg.apt_pkgman = apt_pkg.PackageManager(cfg.apt_depcache)
@@ -34,6 +32,11 @@ def main():
         cfg.apt_sourcelist = apt_pkg.SourceList()
         cfg.apt_sourcelist.read_main_list()
         cfg.apt_pkgrecords = apt_pkg.PackageRecords(cfg.apt_cache)
+
+    # Read MPR cache if we're going to need it.
+    if cfg.operation in cfg.requires_mpr_cache:
+        msg = message.info("Reading MPR cache...", value_return=True, newline=False)
+        cfg.mpr_cache = run_loading_function(msg, read_mpr_cache)
 
     # Run commands.
     if cfg.operation == "install":
@@ -43,4 +46,4 @@ def main():
     elif cfg.operation == "remove":
         remove()
     elif cfg.operation == "search":
-        search_package()
+        search()

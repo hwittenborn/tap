@@ -23,7 +23,7 @@ class _create_pkg_object:
         self.keywords = json_dict["Keywords"]
 
 
-class read_cache:
+class read_mpr_cache:
     def __init__(self):
         filename = f"/var/cache/{cfg.application_name}/mpr-cache.json"
 

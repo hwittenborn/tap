@@ -5,15 +5,6 @@ from tap import cfg
 from tap.help_menu import help_menu
 from tap.message import message
 
-shortopts = {
-    "-e": "--min-info",
-    "-h": "--help",
-    "-L": "--skip-less-pipe",
-    "-R": "--rev-alpha",
-    "-V": "--version",
-}
-
-
 def _split_args(args):
     returned_args = []
 
@@ -28,6 +19,8 @@ def _split_args(args):
 
 
 def arg_check():
+    options = []
+
     for i in _split_args(argv[1:]):
         if re.match("^[a-z][a-z-]*$", i) is not None:
             if cfg.operation is None:
@@ -35,43 +28,45 @@ def arg_check():
             else:
                 cfg.packages += [i]
 
-        elif re.match("^-[a-zA-Z]*$", i):
-            if i in shortopts.keys():
-                cfg.options += [shortopts[i]]
-            else:
-                cfg.unknown_options += [i]
-
-        elif re.match("^--[a-zA-Z][a-zA-Z-]*$", i):
-            if i in shortopts.values():
-                cfg.options += [i]
-            else:
-                cfg.unknown_options += [i]
-
-        else:
-            cfg.unknown_options += [i]
+        elif re.match("^-[a-zA-Z-]*$", i):
+            options += [i]
 
     # Remove any duplicate keys from the packages list.
     cfg.packages = list(set(cfg.packages))
 
-    # Process arguments.
-    if cfg.unknown_options != []:
-        for i in cfg.unknown_options:
-            message.error(f"Unknown option '{i}'.")
-        message.error(f"See '{cfg.application_name} --help' for available commands.")
-        exit(1)
-
-    elif (cfg.operation is None) or ("--help" in cfg.options):
+    if cfg.operation is None:
         help_menu()
 
     elif cfg.operation not in cfg.available_commands:
-        message.error(f"Unknown command '{cfg.operation}'.")
+        message.error(f"Invalid command '{cfg.operation}'.")
         message.error(f"See '{cfg.application_name} --help' for available commands.")
         exit(1)
 
-    elif (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):
-        message.error(f"Command '{cfg.operation}' requires arguments.")
+    # Process sub-command arguments.
+    opts = cfg.command_options[cfg.operation]
+    available_options = opts[0]
+    shortopt_mappings = opts[1]
+
+    for i in options:
+        if i in available_options:
+            cfg.options += [i]
+        elif i in shortopt_mappings:
+            cfg.options += [shortopt_mappings[i]]
+        else:
+            cfg.unknown_options += [i]
+
+    if cfg.unknown_options != []:
+        for i in cfg.unknown_options: message.error(f"Unknown option '{i}'.")
+        message.error(f"See '{cfg.application_name} {cfg.operation} --help' for available options.")
         exit(1)
 
+    for i in ("-h", "--help"):
+        if i in cfg.options: help_menu()
+
+    # Check if a command recieved argument when it was/wasn't supposed to.
+    if (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):
+        message.error(f"Command '{cfg.operation}' requires arguments.")
+        exit(1)
     elif (cfg.operation not in cfg.requires_arguments) and (cfg.packages != []):
-        message.error(f"Command '{cfg.operation}' takes no arguments.")
+        message.error(f"Command '{cfg.operation}' doesn't take arguments.")
         exit(1)

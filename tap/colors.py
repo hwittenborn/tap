@@ -9,6 +9,7 @@ class colors:
     magenta = "\033[38;5;92m"
     blue = "\033[38;5;37m"
     orange = "\033[38;5;172m"
+    debian = "\033[38;2;181;0;76m"
 
     # Bolded strings
     normal = f"{white}"
@@ -20,3 +21,4 @@ class colors:
     bold_magenta = f"{magenta}{bold}"
     bold_blue = f"{blue}{bold}"
     bold_orange = f"{orange}{bold}"
+    bold_debian = f"{debian}{bold}"

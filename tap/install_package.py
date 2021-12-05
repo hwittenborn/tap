@@ -7,11 +7,10 @@ from tap.builddir_del_error import builddir_del_error
 from tap.clone_packages import clone_packages
 from tap.get_editor_name import get_editor_name
 from tap.message import message
-from tap.read_cache import read_cache
 from tap.run_loading_function import run_loading_function
 from tap.run_transaction import run_transaction
 from tap.set_mpr_dependencies import set_mpr_dependencies
-from tap.utils import from_mpr, get_user_selection
+from tap.utils import get_user_selection
 
 
 def _create_build_dirs():
@@ -22,7 +21,6 @@ def _create_build_dirs():
 
 def install_package():
     get_editor_name()
-    cfg.mpr_cache = read_cache()
 
     # Make sure all specified packages were able to be found.
     missing_packages = []
