@@ -2,7 +2,7 @@
 from tap import cfg
 from tap.apt_fetch_packages import apt_fetch_packages
 from tap.arg_check import arg_check
-from tap.install_package import install_package
+from tap.install import install
 from tap.message import message
 from tap.remove import remove
 from tap.root_check import root_check
@@ -11,6 +11,7 @@ from tap.update import update
 from tap.read_mpr_cache import read_mpr_cache
 from tap.search import search
 from tap.autoremove import autoremove
+from tap.upgrade import upgrade
 import apt_pkg
 
 
@@ -41,9 +42,11 @@ def main():
 
     # Run commands.
     if cfg.operation == "install":
-        install_package()
+        install()
     elif cfg.operation == "update":
         update()
+    elif cfg.operation == "upgrade":
+        upgrade()
     elif cfg.operation == "remove":
         remove()
     elif cfg.operation == "autoremove":

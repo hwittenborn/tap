@@ -19,7 +19,55 @@ def _create_build_dirs():
     mkdir(f"/var/tmp/{cfg.application_name}/built_packages/")
 
 
-def install_package():
+def _run_pre_transaction():
+    # Mark any APT packages for installation.
+    for i in cfg.apt_packages:
+        cfg.apt_depcache.mark_install(cfg.apt_cache[i])
+        cfg.apt_resolver.protect(cfg.apt_cache[i])
+
+    # If old build directory exists (and we need it), delete it.
+    if cfg.mpr_packages != []:
+        build_dir = f"/var/tmp/{cfg.application_name}"
+
+        if exists(build_dir):
+            if not rmtree.avoids_symlink_attacks:
+                message.error(
+                    "Old build directory exists, and Tap can't confirm if it can safely delete the build directory."
+                )
+                message.error(
+                    f"Please check '{build_dir}', and delete it yourself if you know it is safe to do so."
+                )
+                exit(1)
+
+            msg = message.info(
+                "Removing old build directory...", value_return=True, newline=False
+            )
+            run_loading_function(msg, rmtree, build_dir, onerror=builddir_del_error)
+
+        # Create the build directory.
+        msg = message.info(
+            "Creating build directory...", value_return=True, newline=False
+        )
+
+        try:
+            run_loading_function(msg, _create_build_dirs)
+        except PermissionError:
+            message.error("Couldn't create the build directory.")
+            message.error(
+                f"Make sure the parent directories of '{build_dir}' are writable and try again."
+            )
+            exit(1)
+
+        # Clone packages.
+        chdir(build_dir)
+        msg = message.info("Cloning packages...", value_return=True, newline=False)
+        run_loading_function(msg, clone_packages)
+
+    # Build dependency tree and install packages.
+    set_mpr_dependencies()
+    run_transaction()
+
+def install():
     get_editor_name()
 
     # Make sure all specified packages were able to be found.
@@ -67,49 +115,4 @@ def install_package():
             message.error2(i)
         exit(1)
 
-    # Mark any APT packages for installation.
-    for i in cfg.apt_packages:
-        cfg.apt_depcache.mark_install(cfg.apt_cache[i])
-        cfg.apt_resolver.protect(cfg.apt_cache[i])
-
-    # If old build directory exists (and we need it), delete it.
-    if cfg.mpr_packages != []:
-        build_dir = f"/var/tmp/{cfg.application_name}"
-
-        if exists(build_dir):
-            if not rmtree.avoids_symlink_attacks:
-                message.error(
-                    "Old build directory exists, and Tap can't confirm if it can safely delete the build directory."
-                )
-                message.error(
-                    f"Please check '{build_dir}', and delete it yourself if you know it is safe to do so."
-                )
-                exit(1)
-
-            msg = message.info(
-                "Removing old build directory...", value_return=True, newline=False
-            )
-            run_loading_function(msg, rmtree, build_dir, onerror=builddir_del_error)
-
-        # Create the build directory.
-        msg = message.info(
-            "Creating build directory...", value_return=True, newline=False
-        )
-
-        try:
-            run_loading_function(msg, _create_build_dirs)
-        except PermissionError:
-            message.error("Couldn't create the build directory.")
-            message.error(
-                f"Make sure the parent directories of '{build_dir}' are writable and try again."
-            )
-            exit(1)
-
-        # Clone packages.
-        chdir(build_dir)
-        msg = message.info("Cloning packages...", value_return=True, newline=False)
-        run_loading_function(msg, clone_packages)
-
-    # Build dependency tree and install packages.
-    set_mpr_dependencies()
-    run_transaction()
+    _run_pre_transaction()

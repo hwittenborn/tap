@@ -28,14 +28,15 @@ build_user = None
 available_commands = {
     "install": "Install packages",
     "update": "Update local repository caches",
+    "upgrade": "Upgrade installed packages",
     "remove": "Remove installed packages",
     "autoremove": "Remove any unneeded packages",
     "search": "Search for packages"
 }
 
 requires_arguments = ["install", "remove", "search"]
-requires_sudo = ["install", "update", "remove", "autoremove"]
-requires_apt_cache = ["install", "upgrade", "remove", "autoremove", "search"]
+requires_sudo = ["install", "update", "upgrade", "remove", "autoremove"]
+requires_apt_cache = ["install", "update", "upgrade", "remove", "autoremove", "search"]
 requires_mpr_cache = ["install", "upgrade", "search"]
 
 # Information on commands.
@@ -44,6 +45,9 @@ install_options = {
 }
 update_options = {
     "--help": "Bring up this help menu"
+}
+upgrade_options = {
+    "--help": "bring up this help menu"
 }
 remove_options = {
     "--help": "Bring up this help menu",
@@ -60,9 +64,18 @@ search_options = {
     "--mpr-only": "Only show packages available in the MPR"
 }
 
-install_shortopts = {}
-update_shortopts = {}
-remove_shortopts = {}
+install_shortopts = {
+    "-h": "--help"
+}
+update_shortopts = {
+    "-h": "--help"
+}
+upgrade_shortopts = {
+    "-h": "--help"
+}
+remove_shortopts = {
+    "-h": "--help"
+}
 autoremove_shortopts = {
     "-h": "--help"
 }
@@ -75,6 +88,7 @@ search_shortopts = {
 command_options = {
     "install": (install_options, install_shortopts),
     "update": (update_options, update_shortopts),
+    "upgrade": (upgrade_options, upgrade_shortopts),
     "remove": (remove_options, remove_shortopts),
     "autoremove": (autoremove_options, autoremove_shortopts),
     "search": (search_options, search_shortopts)

@@ -28,7 +28,12 @@ def _get_apt_package_descriptions():
         except KeyError: continue
 
         pkgbase = cfg.apt_depcache.get_candidate_ver(i)
-        cfg.apt_pkgrecords.lookup(pkgbase.file_list[0])
+        
+        try:
+            cfg.apt_pkgrecords.lookup(pkgbase.file_list[0])
+        except AttributeError:
+            cfg.apt_cache[i.name]
+            exit()
 
         pkgname = i.name
         pkgdesc = cfg.apt_pkgrecords.short_desc
