@@ -82,62 +82,33 @@ def _get_description(pkgname):
         return cfg.mpr_cache.package_dicts[pkgname].description
 
 
-def search():
-    # Get list of package descriptions for packages in APT cache.
-    if ("--mpr-only" not in cfg.options) and (
-        not cfg.config_data["search"]["mpr_only"]
-    ):
-        msg = message.info(
-            "Reading package descriptions...", newline=False, value_return=True
-        )
-        apt_package_descriptions = run_loading_function(
-            msg, _get_apt_package_descriptions
-        )
-
-    # Search each provided package.
-    for pkg in cfg.packages:
-        if ("--mpr-only" not in cfg.options) and (
-            not cfg.config_data["search"]["mpr_only"]
-        ):
-            for apt_pkg in apt_package_descriptions:
-                if (pkg in apt_pkg) or (pkg in apt_package_descriptions[apt_pkg]):
-                    cfg.apt_packages += [apt_pkg]
-
-        if ("--apt-only" not in cfg.options) and (
-            not cfg.config_data["search"]["apt_only"]
-        ):
-            # Search MPR packages.
-            for mpr_pkg in cfg.mpr_cache.package_dicts:
-                pkgdesc = cfg.mpr_cache.package_dicts[mpr_pkg].description
-                if pkgdesc is None:
-                    pkgdesc = ""
-
-                if (pkg in mpr_pkg) or (pkg in pkgdesc):
-                    cfg.mpr_packages += [mpr_pkg]
-
-    # Generate results.
+def _generate_results():
     results_string = ""
     packages = set(cfg.apt_packages + cfg.mpr_packages)
     packages = list(packages)
     packages.sort()
-
+    
     if ("--rev-alpha" in cfg.options) or (cfg.config_data["search"]["rev_alpha"]):
         packages.reverse()
 
     list_length = len(packages) - 1
 
     for index, pkgname in enumerate(packages):
+        if ("--pkgname-only" in cfg.options) or (cfg.config_data[cfg.operation]["pkgname_only"]):
+            results_string += f"{pkgname}\n"
+            continue
+
         pkgver = _get_latest_version(pkgname)
         pkgdesc = _get_description(pkgname)
 
         bracketed_strings = []
 
-        if pkgname in cfg.apt_cache:
+        installed = is_installed(pkgname)
+        
+        if (pkgname in cfg.apt_cache) and (installed != "mpr"):
             bracketed_strings += [f"{colors.debian}APT{colors.normal}"]
         if pkgname in cfg.mpr_cache.package_names:
             bracketed_strings += [f"{colors.orange}MPR{colors.normal}"]
-
-        installed = is_installed(pkgname)
 
         if installed == "apt":
             bracketed_strings += [f"{colors.cyan}Installed-APT{colors.normal}"]
@@ -163,3 +134,38 @@ def search():
         subprocess.run(["less", "-r"], input=results_string.encode())
     else:
         print(results_string, end="")
+
+def search():
+    # Get list of package descriptions for packages in APT cache.
+    if ("--mpr-only" not in cfg.options) and (
+        not cfg.config_data["search"]["mpr_only"]
+    ):
+        if (not "--pkgname-only" in cfg.options) and (not cfg.config_data[cfg.operation]["pkgname_only"]):
+            msg = message.info("Reading package descriptions...", newline=False, value_return=True)
+            apt_package_descriptions = run_loading_function(msg, _get_apt_package_descriptions)
+        else:
+            apt_package_descriptions = _get_apt_package_descriptions()
+
+    # Search each provided package.
+    for pkg in cfg.packages:
+        if ("--mpr-only" not in cfg.options) and (
+            not cfg.config_data["search"]["mpr_only"]
+        ):
+            for apt_pkg in apt_package_descriptions:
+                if (pkg in apt_pkg) or (pkg in apt_package_descriptions[apt_pkg]):
+                    cfg.apt_packages += [apt_pkg]
+
+        if ("--apt-only" not in cfg.options) and (
+            not cfg.config_data["search"]["apt_only"]
+        ):
+            # Search MPR packages.
+            for mpr_pkg in cfg.mpr_cache.package_dicts:
+                pkgdesc = cfg.mpr_cache.package_dicts[mpr_pkg].description
+                if pkgdesc is None:
+                    pkgdesc = ""
+
+                if (pkg in mpr_pkg) or (pkg in pkgdesc):
+                    cfg.mpr_packages += [mpr_pkg]
+
+    # Generate results.
+    _generate_results()

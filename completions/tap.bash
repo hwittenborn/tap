@@ -1,57 +1,51 @@
 #!/usr/bin/env bash
 _tap() {
-	number_of_args="${COMP_CWORD}"
+    base_commands=('install' 'update' 'upgrade' 'remove'
+                   'autoremove' 'search')
 
-	# Get current full value
-	current_value="$(eval echo "\${COMP_WORDS[$(( $number_of_args - 1 ))]}")"
+    accepts_args=('install' 'remove' 'search')
+    install_opts=('-h' '--help')
+    update_opts=('-h' '--help')
+    upgrade_opts=('-h' '--help')
+    remove_opts=('-h' '--help' '--purge')
+    autoremove_opts=('-h' '--help')
+    search_opts=('-h' '--help' '-R' '--rev-alpha'
+                 '-L' '--skip-less-pipe' '--apt-only' '--mpr-only'
+                 '-q' '--quiet' '--pkgname-only')
+    list_opts=('-h' '--help' '-R' '--rev-alpha'
+               '-L' '--skip-less-pipe' '--apt-only' '--mpr-only'
+               '-q' '--quiet' '--pkgname-only' '--installed'
+               '--upgradable')
 
-	# This gets triggered if a user is in the middle of writing an argument
-	next_value="$(eval echo "\${COMP_WORDS[$number_of_args]}")"
+    number_of_args="${#COMP_WORDS[@]}"
+    command="${COMP_WORDS[1]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    
+    # Process very first arg.
+    if [[ "${number_of_args}" == "2" ]]; then
+        mapfile -t COMPREPLY < <(printf '%s\n' "${base_commands[@]}" | grep "^${cur}" 2> /dev/null)
+        return
+    fi
 
-	# Return available commands if only 'tap' is specified
-	if [[ "${number_of_args}" == "1" ]]; then
+    # Process command options (if it's a valid command).
+    valid_command=0
 
-		COMPREPLY=('install' 'update' 'upgrade' 'search' 'list-packages')
+    for i in "${base_commands[@]}"; do
+        if [[ "${command}" == "${i}" ]]; then
+            valid_command=1
+            break
+        fi
+    done
 
-		if [[ "${next_value}" != "" ]]; then
-			COMPREPLY=($(echo "${COMPREPLY[@]}" | sed 's| |\n|g' | grep "^${next_value}"))
-		fi
+    if ! (( "${valid_command}" )); then
+        COMPREPLY=()
+        return
+    fi
+    
+    opts="${command}_opts[@]"
 
-		return
-	fi
-
-	# Check that a valid command was passed
-	specified_command="${COMP_WORDS[1]}"
-
-	for i in 'install' 'update' 'upgrade' 'search' 'list-packages'; do
-		if [[ "${specified_command}" == "${i}" ]]; then
-			valid_command="true"
-		fi
-	done
-
-	if [[ "${valid_command}" != "true" ]]; then
-		COMPREPLY=()
-		return
-	fi
-
-	# Auto-fill for packages when using 'install'.
-	# Uses 'specified_command' from the command validation above.
-	if [[ "${specified_command}" == "install" && "${next_value}" != "" ]]; then
-
-		mpr_json_data="$(curl -s "https://mpr.hunterwittenborn.com/rpc/?v=5&type=search&arg=${next_value}")"
-
-		# Return nothing if returned JSON is not valid
-		if ! echo "${mpr_json_data}" | jq &> /dev/null; then
-			COMPREPLY=()
-			return
-		fi
-
-		# Return package list.
-		mpr_json_package_names="$(echo "${mpr_json_data}" | jq -r '.results[].Name' | grep "^${next_value}")"
-
-		COMPREPLY=(${mpr_json_package_names})
-		return
-	fi
+    mapfile -t COMPREPLY < <(printf '%s\n' "${!opts}" | grep "^${cur}" 2> /dev/null)
+    return
 }
 
 complete -F _tap tap

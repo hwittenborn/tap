@@ -72,6 +72,6 @@ def arg_check():
     if (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):
         message.error(f"Command '{cfg.operation}' requires arguments.")
         exit(1)
-    elif (cfg.operation not in cfg.requires_arguments) and (cfg.packages != []):
+    elif (cfg.operation not in cfg.requires_arguments) and (cfg.operation not in cfg.optional_arguments) and (cfg.packages != []):
         message.error(f"Command '{cfg.operation}' doesn't take arguments.")
         exit(1)
