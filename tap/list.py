@@ -2,6 +2,7 @@ from tap import cfg
 from tap.search import _generate_results
 from tap.utils import is_installed
 
+
 def list():
     for pkg in cfg.packages:
         # Process APT listings.
@@ -9,12 +10,18 @@ def list():
             installed = is_installed(pkg)
 
             if ("--installed" in cfg.options) or (cfg.config_data["list"]["installed"]):
-                if installed is False: continue
-            if ("--upgradable" in cfg.options) or (cfg.config_data["list"]["upgradable"]):
-                if not cfg.apt_depcache.is_upgradable(cfg.apt_cache[pkg]): continue
+                if installed is False:
+                    continue
+            if ("--upgradable" in cfg.options) or (
+                cfg.config_data["list"]["upgradable"]
+            ):
+                if not cfg.apt_depcache.is_upgradable(cfg.apt_cache[pkg]):
+                    continue
             if ("--apt-only" in cfg.options) or (cfg.config_data["list"]["apt_only"]):
-                if installed not in (False, "apt"): continue
-            if ("--mpr-only" in cfg.options) or (cfg.config_data["list"]["mpr_only"]): continue
+                if installed not in (False, "apt"):
+                    continue
+            if ("--mpr-only" in cfg.options) or (cfg.config_data["list"]["mpr_only"]):
+                continue
 
             cfg.apt_packages += [pkg]
 
@@ -23,13 +30,19 @@ def list():
             installed = is_installed(pkg)
 
             if ("--installed" in cfg.options) or (cfg.config_data["list"]["installed"]):
-                if installed is False: continue
-            if ("--upgradable" in cfg.options) or (cfg.config_data["list"]["upgradable"]):
-                if not cfg.apt_depcache.is_upgradable(cfg.apt_cache[pkg]): continue
-            if ("--apt-only" in cfg.options) or (cfg.config_data["list"]["apt_only"]): continue
+                if installed is False:
+                    continue
+            if ("--upgradable" in cfg.options) or (
+                cfg.config_data["list"]["upgradable"]
+            ):
+                if not cfg.apt_depcache.is_upgradable(cfg.apt_cache[pkg]):
+                    continue
+            if ("--apt-only" in cfg.options) or (cfg.config_data["list"]["apt_only"]):
+                continue
             if ("--mpr-only" in cfg.options) or (cfg.config_data["list"]["mpr_only"]):
-                if installed not in (False, "mpr"): continue
+                if installed not in (False, "mpr"):
+                    continue
 
             cfg.mpr_packages += [pkg]
-    
+
     _generate_results()

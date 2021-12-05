@@ -33,13 +33,21 @@ available_commands = {
     "remove": "Remove installed packages",
     "autoremove": "Remove any unneeded packages",
     "search": "Search for packages",
-    "list": "List installed packages"
+    "list": "List installed packages",
 }
 
 requires_arguments = ["install", "remove", "search"]
 optional_arguments = ["list"]
 requires_sudo = ["install", "update", "upgrade", "remove", "autoremove"]
-requires_apt_cache = ["install", "update", "upgrade", "remove", "autoremove", "search", "list"]
+requires_apt_cache = [
+    "install",
+    "update",
+    "upgrade",
+    "remove",
+    "autoremove",
+    "search",
+    "list",
+]
 requires_mpr_cache = ["install", "upgrade", "search", "list"]
 
 # Information on commands.
@@ -58,7 +66,7 @@ search_options = {
     "--quiet": "Hide information messages.",
     "--apt-only": "Only show packages available via APT",
     "--mpr-only": "Only show packages available in the MPR",
-    "--pkgname-only": "Only print package names"
+    "--pkgname-only": "Only print package names",
 }
 list_options = {
     "--help": "Bring up this help menu",
@@ -69,7 +77,7 @@ list_options = {
     "--upgradable": "Only show upgradable packages",
     "--apt-only": "Only show packages available via APT",
     "--mpr-only": "Only show packages available in the MPR",
-    "--pkgname-only": "Only print package names"
+    "--pkgname-only": "Only print package names",
 }
 
 install_shortopts = {"-h": "--help"}
@@ -77,8 +85,18 @@ update_shortopts = {"-h": "--help"}
 upgrade_shortopts = {"-h": "--help"}
 remove_shortopts = {"-h": "--help"}
 autoremove_shortopts = {"-h": "--help"}
-search_shortopts = {"-h": "--help", "-L": "--skip-less-pipe", "-R": "--rev-alpha", "-q": "--quiet"}
-list_shortopts = {"-h": "--help", "-L": "--skip-less-pipe", "-R": "--rev-alpha", "-q": "--quiet"}
+search_shortopts = {
+    "-h": "--help",
+    "-L": "--skip-less-pipe",
+    "-R": "--rev-alpha",
+    "-q": "--quiet",
+}
+list_shortopts = {
+    "-h": "--help",
+    "-L": "--skip-less-pipe",
+    "-R": "--rev-alpha",
+    "-q": "--quiet",
+}
 command_options = {
     "install": (install_options, install_shortopts),
     "update": (update_options, update_shortopts),
@@ -86,7 +104,7 @@ command_options = {
     "remove": (remove_options, remove_shortopts),
     "autoremove": (autoremove_options, autoremove_shortopts),
     "search": (search_options, search_shortopts),
-    "list": (list_options, list_shortopts)
+    "list": (list_options, list_shortopts),
 }
 
 # Caches used for package installation.

@@ -18,6 +18,7 @@ def _install_apt_packages(**kwargs):
     show_to_build = kwargs.get("show_to_build", True)
 
     to_apt_install = []
+    to_additionally_install = []
     to_upgrade = []
     to_downgrade = []
     to_remove = []
@@ -26,6 +27,9 @@ def _install_apt_packages(**kwargs):
     for i in cfg.apt_cache.packages:
         if cfg.apt_depcache.marked_install(i):
             to_apt_install += [i.name]
+
+            if i.name not in (cfg.apt_packages + cfg.mpr_packages):
+                to_additionally_install += [i.name]
 
         elif cfg.apt_depcache.marked_upgrade(i):
             to_upgrade += [i.name]
@@ -60,6 +64,10 @@ def _install_apt_packages(**kwargs):
     generate_apt_styled_text(
         "The following packages are going to be installed:",
         cfg.mpr_packages + to_apt_install,
+    )
+    generate_apt_styled_text(
+        "The following additional packages are going to be installed:",
+        to_additionally_install,
     )
     generate_apt_styled_text(
         "The following packages are going to be upgraded:", to_upgrade

@@ -28,7 +28,7 @@ def main():
     # Generate APT cache if we're going to need it.
     if cfg.operation in cfg.requires_apt_cache:
         apt_pkg.init()
-        
+
         if not "--quiet" in cfg.options:
             msg = message.info("Reading APT cache...", value_return=True, newline=False)
             cfg.apt_cache = run_loading_function(msg, apt_pkg.Cache, None)

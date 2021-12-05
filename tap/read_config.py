@@ -11,8 +11,22 @@ _key_maps = {"remove": _remove_keys, "search": _search_keys}
 
 _default_config = {
     "remove": {"purge": 0},
-    "search": {"rev_alpha": 0, "skip_less_pipe": 0, "apt_only": 0, "mpr_only": 0, "pkgname_only": 0},
-    "list": {"rev_alpha": 0, "skip_less_pipe": 0, "installed": 0, "upgradable": 0, "apt_only": 0, "mpr_only": 0, "pkgname_only": 0}
+    "search": {
+        "rev_alpha": 0,
+        "skip_less_pipe": 0,
+        "apt_only": 0,
+        "mpr_only": 0,
+        "pkgname_only": 0,
+    },
+    "list": {
+        "rev_alpha": 0,
+        "skip_less_pipe": 0,
+        "installed": 0,
+        "upgradable": 0,
+        "apt_only": 0,
+        "mpr_only": 0,
+        "pkgname_only": 0,
+    },
 }
 
 
@@ -21,8 +35,10 @@ def read_config():
 
     if not exists(cfg.config_file):
         if "--quiet" not in cfg.options:
-            message.warning("Couldn't find config file, falling back to default values.")
-        
+            message.warning(
+                "Couldn't find config file, falling back to default values."
+            )
+
         cfg.config_data = _default_config
         return
 
@@ -75,5 +91,5 @@ def read_config():
         message.warning("Config file is invalid:")
         for i in bad_config_reasons:
             print(i, end="")
-            
+
         message.warning("Falling back to default values for invalid items.")
