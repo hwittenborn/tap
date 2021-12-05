@@ -11,12 +11,9 @@ from apt_pkg import (
 
 
 def remove():
-    cfg.apt_packages = cfg.mpr_packages
-    cfg.mpr_packages = []
-
     not_installed = []
 
-    for i in cfg.apt_packages:
+    for i in cfg.packages:
         try:
             cfg.apt_cache[i]
         except KeyError:
@@ -29,7 +26,11 @@ def remove():
             CURSTATE_HALF_CONFIGURED,
             CURSTATE_UNPACKED,
         ):
-            cfg.apt_depcache.mark_delete(cfg.apt_cache[i])
+            if "--purge" in cfg.options:
+                cfg.apt_depcache.mark_delete(cfg.apt_cache[i], True)
+            else:
+                cfg.apt_depcache.mark_delete(cfg.apt_cache[i])
+            
             cfg.apt_resolver.protect(cfg.apt_cache[i])
         else:
             not_installed += [i]

@@ -83,7 +83,8 @@ def _install_apt_packages(**kwargs):
 
     if (len_to_install + len_to_upgrade + len_to_downgrade + len_to_remove) == 0:
         exit(0)
-
+    
+    print()
     msg = message.question(
         "Would you like to continue? [Y/n] ", value_return=True, newline=False
     )
@@ -123,110 +124,108 @@ def _install_apt_packages(**kwargs):
             message.error("Failed installing packages.")
             exit(1)
 
-        print()
-
-
 def run_transaction():
     _install_apt_packages()
+    
+    if cfg.mpr_packages != []:
+        # Start building packages.
+        message.info("Building packages...")
+        failed_builds = []
+        built_packages = []
 
-    # Start building packages.
-    message.info("Building packages...")
-    failed_builds = []
-    built_packages = []
+        for pkgbase in cfg.mpr_packages:
+            chdir(f"/var/tmp/{cfg.application_name}/source_packages/{pkgbase}/")
 
-    for pkgbase in cfg.mpr_packages:
-        chdir(f"/var/tmp/{cfg.application_name}/source_packages/{pkgbase}/")
+            pkginfo = parse_srcinfo(".SRCINFO")
+            pkgname = pkginfo.pkgname
+            version = pkginfo.version
+            arch = pkginfo.arch
+            mpr_package_field = False
 
-        pkginfo = parse_srcinfo(".SRCINFO")
-        pkgname = pkginfo.pkgname
-        version = pkginfo.version
-        arch = pkginfo.arch
-        mpr_package_field = False
-
-        # We have to check for the 'MPR-Package' control field by sourcing the PKGBUILD right now, as makedeb doesn't currently export that field into SRCINFO files.
-        control_fields = (
-            subprocess.run(
-                ["bash", "-c", "source PKGBUILD; printf '%s' \"${control_fields[@]}\""],
-                stdout=PIPE,
+            # We have to check for the 'MPR-Package' control field by sourcing the PKGBUILD right now, as makedeb doesn't currently export that field into SRCINFO files.
+            control_fields = (
+                subprocess.run(
+                    ["bash", "-c", "source PKGBUILD; printf '%s' \"${control_fields[@]}\""],
+                    stdout=PIPE,
+                )
+                .stdout.decode()
+                .splitlines()
             )
-            .stdout.decode()
-            .splitlines()
+
+            if control_fields != []:
+                for field in control_fields:
+                    args = field.split(": ")
+
+                    if args[0] == "MPR-Package":
+                        mpr_package_field = True
+                        break
+
+            # Actually build the package.
+            additional_args = []
+
+            if not mpr_package_field:
+                additional_args = ["-H", f"MPR-Package: {pkgbase}"]
+
+            proc = subprocess.run(
+                ["sudo", "-nu", f"#{cfg.build_user}", "--", "makedeb"] + additional_args
+            )
+
+            if proc.returncode != 0:
+                message.error(f"Package '{pkgbase}' failed to build.")
+                msg = message.question(
+                    "Would you like to abort the build process? "
+                    "This will result in all packages marked for building not being installed. [Y/n] ",
+                    newline=False,
+                    value_return=True,
+                )
+
+                response = input(msg).lower()
+
+                if response != "n":
+                    message.error("Aborting...")
+                    exit(1)
+
+                else:
+                    message.info("Continuing with builds...")
+
+            # Copy built packages to temp directory for installation later.
+            for name in pkgname:
+                with open(f"./pkg/{name}/DEBIAN/control", "r") as file:
+                    control_info = parse_control(file.read())
+                    version = control_info.version
+                    arch = control_info.arch
+
+                filename = f"{name}_{version}_{arch}.deb"
+                built_packages += [filename]
+                copy2(
+                    f"./{filename}",
+                    f"/var/tmp/{cfg.application_name}/built_packages/{filename}",
+                )
+
+        # Install all the packages!
+        message.info("Installing built packages...")
+        depends_list = []
+        conflicts_list = []
+        breaks_list = []
+
+        chdir(f"/var/tmp/{cfg.application_name}/built_packages/")
+
+        for i in built_packages:
+            debfile = DebPackage(f"./{i}")
+            control = debfile.control_content("control")
+
+            control_info = parse_control(control)
+            depends_list += control_info.predepends + control_info.depends
+            conflicts_list += control_info.conflicts
+            breaks_list += control_info.breaks
+
+        build_dependency_tree(
+            depends=depends_list, conflicts=conflicts_list, breaks=breaks_list
         )
+        _install_apt_packages(show_to_build=False)
 
-        if control_fields != []:
-            for field in control_fields:
-                args = field.split(": ")
-
-                if args[0] == "MPR-Package":
-                    mpr_package_field = True
-                    break
-
-        # Actually build the package.
-        additional_args = []
-
-        if not mpr_package_field:
-            additional_args = ["-H", f"MPR-Package: {pkgbase}"]
-
-        proc = subprocess.run(
-            ["sudo", "-nu", f"#{cfg.build_user}", "--", "makedeb"] + additional_args
-        )
-
-        if proc.returncode != 0:
-            message.error(f"Package '{pkgbase}' failed to build.")
-            msg = message.question(
-                "Would you like to abort the build process? "
-                "This will result in all packages marked for building not being installed. [Y/n] ",
-                newline=False,
-                value_return=True,
-            )
-
-            response = input(msg).lower()
-
-            if response != "n":
-                message.error("Aborting...")
-                exit(1)
-
-            else:
-                message.info("Continuing with builds...")
-
-        # Copy built packages to temp directory for installation later.
-        for name in pkgname:
-            with open(f"./pkg/{name}/DEBIAN/control", "r") as file:
-                control_info = parse_control(file.read())
-                version = control_info.version
-                arch = control_info.arch
-
-            filename = f"{name}_{version}_{arch}.deb"
-            built_packages += [filename]
-            copy2(
-                f"./{filename}",
-                f"/var/tmp/{cfg.application_name}/built_packages/{filename}",
-            )
-
-    # Install all the packages!
-    message.info("Installing built packages...")
-    depends_list = []
-    conflicts_list = []
-    breaks_list = []
-
-    chdir(f"/var/tmp/{cfg.application_name}/built_packages/")
-
-    for i in built_packages:
-        debfile = DebPackage(f"./{i}")
-        control = debfile.control_content("control")
-
-        control_info = parse_control(control)
-        depends_list += control_info.predepends + control_info.depends
-        conflicts_list += control_info.conflicts
-        breaks_list += control_info.breaks
-
-    build_dependency_tree(
-        depends=depends_list, conflicts=conflicts_list, breaks=breaks_list
-    )
-    _install_apt_packages(show_to_build=False)
-
-    for i in built_packages:
-        debfile = DebPackage(f"./{i}")
-        debfile.install()
-
+        for i in built_packages:
+            debfile = DebPackage(f"./{i}")
+            debfile.install()
+    
     message.info("Done.")

@@ -10,7 +10,7 @@ from tap.message import message
 from tap.run_loading_function import run_loading_function
 from tap.run_transaction import run_transaction
 from tap.set_mpr_dependencies import set_mpr_dependencies
-from tap.utils import get_user_selection
+from tap.utils import get_user_selection, is_installed
 
 
 def _create_build_dirs():
@@ -28,16 +28,16 @@ def install_package():
     for i in cfg.packages:
         available_apt = False
         available_mpr = False
-
-        if i in cfg.apt_cache:
-            if not from_mpr(i):
-                available_apt = True
-            else:
-                available_mpr = True
-
-        if i in cfg.mpr_cache.package_bases:
+        
+        installed = is_installed(i)
+        
+        # Check installation sources.
+        if (installed != "mpr") and (i in cfg.apt_cache):
+            available_apt = True
+        if (installed == "mpr") or (i in cfg.mpr_cache.package_bases):
             available_mpr = True
-
+        
+        # Add to relevant package lists.
         if (not available_apt) and (not available_mpr):
             missing_packages += [i]
 
@@ -58,7 +58,7 @@ def install_package():
 
             if response == "APT":
                 cfg.apt_packages += [i]
-            else:
+            elif response == "MPR":
                 cfg.mpr_packages += [i]
 
     if missing_packages != []:

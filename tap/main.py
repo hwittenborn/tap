@@ -10,6 +10,7 @@ from tap.run_loading_function import run_loading_function
 from tap.update import update
 from tap.read_mpr_cache import read_mpr_cache
 from tap.search import search
+from tap.autoremove import autoremove
 import apt_pkg
 
 
@@ -45,5 +46,7 @@ def main():
         update()
     elif cfg.operation == "remove":
         remove()
+    elif cfg.operation == "autoremove":
+        autoremove()
     elif cfg.operation == "search":
         search()

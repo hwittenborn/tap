@@ -29,18 +29,29 @@ available_commands = {
     "install": "Install packages",
     "update": "Update local repository caches",
     "remove": "Remove installed packages",
+    "autoremove": "Remove any unneeded packages",
     "search": "Search for packages"
 }
 
 requires_arguments = ["install", "remove", "search"]
-requires_sudo = ["install", "update", "remove"]
-requires_apt_cache = ["install", "upgrade", "remove", "search"]
+requires_sudo = ["install", "update", "remove", "autoremove"]
+requires_apt_cache = ["install", "upgrade", "remove", "autoremove", "search"]
 requires_mpr_cache = ["install", "upgrade", "search"]
 
 # Information on commands.
-install_options = {}
-update_options = {}
-remove_options = {}
+install_options = {
+    "--help": "Bring up this help menu"
+}
+update_options = {
+    "--help": "Bring up this help menu"
+}
+remove_options = {
+    "--help": "Bring up this help menu",
+    "--purge": "Remove configuration files for packages upon removal"
+}
+autoremove_options = {
+    "--help": "Bring up this help menu"
+}
 search_options = {
     "--help": "Bring up this help menu",
     "--rev-alpha": "Sort package results from Z-A instead of A-Z",
@@ -52,6 +63,9 @@ search_options = {
 install_shortopts = {}
 update_shortopts = {}
 remove_shortopts = {}
+autoremove_shortopts = {
+    "-h": "--help"
+}
 search_shortopts = {
     "-h": "--help",
     "-L": "--skip-less-pipe",
@@ -62,6 +76,7 @@ command_options = {
     "install": (install_options, install_shortopts),
     "update": (update_options, update_shortopts),
     "remove": (remove_options, remove_shortopts),
+    "autoremove": (autoremove_options, autoremove_shortopts),
     "search": (search_options, search_shortopts)
 }
 
