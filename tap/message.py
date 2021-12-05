@@ -2,6 +2,8 @@ from tap.colors import colors
 
 
 def _return_message(message, **kwargs):
+    message = message.rstrip("\n")
+
     value_return = kwargs.get("value_return", False)
     newline = kwargs.get("newline", True)
 

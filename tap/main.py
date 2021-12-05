@@ -12,11 +12,13 @@ from tap.read_mpr_cache import read_mpr_cache
 from tap.search import search
 from tap.autoremove import autoremove
 from tap.upgrade import upgrade
+from tap.read_config import read_config
 import apt_pkg
 
 
 def main():
     arg_check()
+    read_config()
 
     if cfg.operation in cfg.requires_sudo:
         root_check()

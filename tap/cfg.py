@@ -15,7 +15,8 @@ os_architecture = subprocess.run(
     ["uname", "-m"], stdout=subprocess.PIPE, universal_newlines=True
 ).stdout.strip()
 editor_name = None
-
+config_file = environ.get("TAP_CONFIG_FILE", "/etc/tap.cfg")
+config_data = {}
 # Information on current transaction.
 operation = None
 packages = []

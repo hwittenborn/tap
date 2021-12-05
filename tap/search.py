@@ -75,18 +75,18 @@ def _get_description(pkgname):
 
 def search():
     # Get list of package descriptions for packages in APT cache.
-    if "--mpr-only" not in cfg.options:
+    if ("--mpr-only" not in cfg.options) and (not cfg.config_data["search"]["mpr_only"]):
         msg = message.info("Reading package descriptions...", newline=False, value_return=True)
         apt_package_descriptions = run_loading_function(msg, _get_apt_package_descriptions)
 
     # Search each provided package.
     for pkg in cfg.packages:
-        if "--mpr-only" not in cfg.options:
+        if ("--mpr-only" not in cfg.options) and (not cfg.config_data["search"]["mpr_only"]):
             for apt_pkg in apt_package_descriptions:
                 if (pkg in apt_pkg) or (pkg in apt_package_descriptions[apt_pkg]):
                     cfg.apt_packages += [apt_pkg]
 
-        if "--apt-only" not in cfg.options:
+        if ("--apt-only" not in cfg.options) and (not cfg.config_data["search"]["apt_only"]):
             # Search MPR packages.
             for mpr_pkg in cfg.mpr_cache.package_dicts:
                 pkgdesc = cfg.mpr_cache.package_dicts[mpr_pkg].description
@@ -100,7 +100,7 @@ def search():
     packages = list(packages)
     packages.sort()
 
-    if "--rev-alpha" in cfg.options: packages.reverse()
+    if ("--rev-alpha" in cfg.options) or (cfg.config_data["search"]["rev_alpha"]): packages.reverse()
 
     list_length = len(packages) - 1
 

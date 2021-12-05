@@ -26,7 +26,7 @@ def remove():
             CURSTATE_HALF_CONFIGURED,
             CURSTATE_UNPACKED,
         ):
-            if "--purge" in cfg.options:
+            if ("--purge" in cfg.options) or (cfg.config_data["remove"]["purge"]):
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i], True)
             else:
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i])
