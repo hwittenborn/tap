@@ -17,8 +17,10 @@ def is_installed(pkgname):
     installed = False
 
     try:
-        if cfg.apt_cache[pkgname].current_state == CURSTATE_INSTALLED: installed = True
-    except KeyError: installed = False
+        if cfg.apt_cache[pkgname].current_state == CURSTATE_INSTALLED:
+            installed = True
+    except KeyError:
+        installed = False
 
     if not installed:
         return False
@@ -29,7 +31,9 @@ def is_installed(pkgname):
                 try:
                     section["MPR-Package"]
                     return "mpr"
-                except KeyError: return "apt"
+                except KeyError:
+                    return "apt"
+
 
 def get_user_selection(question, options, **kwargs):
     msg2_function = kwargs["msg2_function"]

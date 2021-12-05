@@ -67,6 +67,7 @@ def _run_pre_transaction():
     set_mpr_dependencies()
     run_transaction()
 
+
 def install():
     get_editor_name()
 
@@ -76,15 +77,15 @@ def install():
     for i in cfg.packages:
         available_apt = False
         available_mpr = False
-        
+
         installed = is_installed(i)
-        
+
         # Check installation sources.
         if (installed != "mpr") and (i in cfg.apt_cache):
             available_apt = True
         if (installed == "mpr") or (i in cfg.mpr_cache.package_bases):
             available_mpr = True
-        
+
         # Add to relevant package lists.
         if (not available_apt) and (not available_mpr):
             missing_packages += [i]

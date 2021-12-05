@@ -6,8 +6,11 @@ from tap.exceptions import newline_error_exception
 from tap.message import message
 from tap.run_loading_function import run_loading_function
 from tap.apt_fetch_packages import apt_fetch_packages
+
+
 def _update_apt():
-    cfg.apt_cache.update(apt_fetch_packages(), apt_pkg.SourceList())
+    cfg.apt_cache.update(apt_fetch_packages(), cfg.apt_sourcelist)
+
 
 def _update_mpr():
     try:
@@ -36,7 +39,6 @@ def _update_mpr():
 
 
 def update():
-    # TODO: This APT cache update isn't working, and I'm not quite sure why.
     msg = message.info("Updating APT cache...", newline=False, value_return=True)
     run_loading_function(msg, _update_apt)
 

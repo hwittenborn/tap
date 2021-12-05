@@ -32,7 +32,7 @@ available_commands = {
     "upgrade": "Upgrade installed packages",
     "remove": "Remove installed packages",
     "autoremove": "Remove any unneeded packages",
-    "search": "Search for packages"
+    "search": "Search for packages",
 }
 
 requires_arguments = ["install", "remove", "search"]
@@ -41,50 +41,28 @@ requires_apt_cache = ["install", "update", "upgrade", "remove", "autoremove", "s
 requires_mpr_cache = ["install", "upgrade", "search"]
 
 # Information on commands.
-install_options = {
-    "--help": "Bring up this help menu"
-}
-update_options = {
-    "--help": "Bring up this help menu"
-}
-upgrade_options = {
-    "--help": "bring up this help menu"
-}
+install_options = {"--help": "Bring up this help menu"}
+update_options = {"--help": "Bring up this help menu"}
+upgrade_options = {"--help": "bring up this help menu"}
 remove_options = {
     "--help": "Bring up this help menu",
-    "--purge": "Remove configuration files for packages upon removal"
+    "--purge": "Remove configuration files for packages upon removal",
 }
-autoremove_options = {
-    "--help": "Bring up this help menu"
-}
+autoremove_options = {"--help": "Bring up this help menu"}
 search_options = {
     "--help": "Bring up this help menu",
     "--rev-alpha": "Sort package results from Z-A instead of A-Z",
     "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
     "--apt-only": "Only show packages available via APT",
-    "--mpr-only": "Only show packages available in the MPR"
+    "--mpr-only": "Only show packages available in the MPR",
 }
 
-install_shortopts = {
-    "-h": "--help"
-}
-update_shortopts = {
-    "-h": "--help"
-}
-upgrade_shortopts = {
-    "-h": "--help"
-}
-remove_shortopts = {
-    "-h": "--help"
-}
-autoremove_shortopts = {
-    "-h": "--help"
-}
-search_shortopts = {
-    "-h": "--help",
-    "-L": "--skip-less-pipe",
-    "-R": "--rev-alpha"
-}
+install_shortopts = {"-h": "--help"}
+update_shortopts = {"-h": "--help"}
+upgrade_shortopts = {"-h": "--help"}
+remove_shortopts = {"-h": "--help"}
+autoremove_shortopts = {"-h": "--help"}
+search_shortopts = {"-h": "--help", "-L": "--skip-less-pipe", "-R": "--rev-alpha"}
 
 command_options = {
     "install": (install_options, install_shortopts),
@@ -92,7 +70,7 @@ command_options = {
     "upgrade": (upgrade_options, upgrade_shortopts),
     "remove": (remove_options, remove_shortopts),
     "autoremove": (autoremove_options, autoremove_shortopts),
-    "search": (search_options, search_shortopts)
+    "search": (search_options, search_shortopts),
 }
 
 # Caches used for package installation.
@@ -112,6 +90,7 @@ APT_BROKEN_PACKAGES = "E:Unable to correct problems, you have held broken packag
 currently_fetching_packages = []
 failed_downloads = []
 first_package_downloaded = False
+loading_function_status = None
 
 # SRCINFO parser info.
 srcinfo_single_keys = ["pkgbase", "pkgver", "pkgrel", "pkgdesc", "url"]

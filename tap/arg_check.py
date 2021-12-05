@@ -5,6 +5,7 @@ from tap import cfg
 from tap.help_menu import help_menu
 from tap.message import message
 
+
 def _split_args(args):
     returned_args = []
 
@@ -56,12 +57,16 @@ def arg_check():
             cfg.unknown_options += [i]
 
     if cfg.unknown_options != []:
-        for i in cfg.unknown_options: message.error(f"Unknown option '{i}'.")
-        message.error(f"See '{cfg.application_name} {cfg.operation} --help' for available options.")
+        for i in cfg.unknown_options:
+            message.error(f"Unknown option '{i}'.")
+        message.error(
+            f"See '{cfg.application_name} {cfg.operation} --help' for available options."
+        )
         exit(1)
 
     for i in ("-h", "--help"):
-        if i in cfg.options: help_menu()
+        if i in cfg.options:
+            help_menu()
 
     # Check if a command recieved argument when it was/wasn't supposed to.
     if (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):

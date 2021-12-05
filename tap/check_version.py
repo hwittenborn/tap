@@ -1,14 +1,9 @@
 from apt_pkg import version_compare
 from operator import lt, le, eq, ge, gt
 
+
 def check_version(ver1, comparison_operator, ver2):
-    operator_mappings = {
-        "<": lt,
-        "<=": le,
-        "=": eq,
-        ">": gt,
-        ">=": ge
-    }
+    operator_mappings = {"<": lt, "<=": le, "=": eq, ">": gt, ">=": ge}
 
     if comparison_operator not in operator_mappings:
         raise TypeError(f"Invalid operator '{comparison_operator}'.")

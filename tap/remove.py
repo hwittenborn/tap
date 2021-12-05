@@ -30,7 +30,7 @@ def remove():
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i], True)
             else:
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i])
-            
+
             cfg.apt_resolver.protect(cfg.apt_cache[i])
         else:
             not_installed += [i]

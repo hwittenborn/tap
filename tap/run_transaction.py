@@ -83,7 +83,7 @@ def _install_apt_packages(**kwargs):
 
     if (len_to_install + len_to_upgrade + len_to_downgrade + len_to_remove) == 0:
         exit(0)
-    
+
     print()
     msg = message.question(
         "Would you like to continue? [Y/n] ", value_return=True, newline=False
@@ -124,9 +124,10 @@ def _install_apt_packages(**kwargs):
             message.error("Failed installing packages.")
             exit(1)
 
+
 def run_transaction():
     _install_apt_packages()
-    
+
     if cfg.mpr_packages != []:
         # Start building packages.
         message.info("Building packages...")
@@ -145,7 +146,11 @@ def run_transaction():
             # We have to check for the 'MPR-Package' control field by sourcing the PKGBUILD right now, as makedeb doesn't currently export that field into SRCINFO files.
             control_fields = (
                 subprocess.run(
-                    ["bash", "-c", "source PKGBUILD; printf '%s' \"${control_fields[@]}\""],
+                    [
+                        "bash",
+                        "-c",
+                        "source PKGBUILD; printf '%s' \"${control_fields[@]}\"",
+                    ],
                     stdout=PIPE,
                 )
                 .stdout.decode()
@@ -227,5 +232,5 @@ def run_transaction():
         for i in built_packages:
             debfile = DebPackage(f"./{i}")
             debfile.install()
-    
+
     message.info("Done.")

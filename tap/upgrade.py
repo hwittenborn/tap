@@ -6,12 +6,14 @@ from tap.set_mpr_dependencies import set_mpr_dependencies
 from tap.install import _run_pre_transaction
 from tap.get_editor_name import get_editor_name
 
+
 def upgrade():
     get_editor_name()
-    
+
     for i in cfg.apt_cache.packages:
-        if i.current_state != CURSTATE_INSTALLED: continue
-        
+        if i.current_state != CURSTATE_INSTALLED:
+            continue
+
         installed = is_installed(i.name)
 
         if installed == "apt":
@@ -28,5 +30,5 @@ def upgrade():
                 cfg.mpr_packages += [rpc_data["PackageBase"]]
 
     cfg.mpr_packages = list(set(cfg.mpr_packages))
-    
+
     _run_pre_transaction()

@@ -2,6 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 import tap
+from tap import cfg
 
 
 def run_loading_function(message, function, *args, **kwargs):
