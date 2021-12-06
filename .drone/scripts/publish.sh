@@ -7,7 +7,7 @@ rm -rf "${HOME}/.ssh/" || true
 mkdir -p "${HOME}/.ssh/"
 
 echo "${ssh_key}" > "${HOME}/.ssh/ssh_key"
-chmod 400 "${HOME}/.ssh/ssh_key" "${HOME}/.ssh/known_hosts"
+chmod 400 "${HOME}/.ssh/ssh_key"
 printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile ${HOME}/.ssh/ssh_key\n" | tee "${HOME}/.ssh/config"
 
 SSH_HOST="${mpr_url}" \
