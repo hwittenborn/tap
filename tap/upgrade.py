@@ -3,13 +3,13 @@ from tap.check_version import check_version
 from tap.get_editor_name import get_editor_name
 from tap.install import _run_pre_transaction
 from tap.utils import is_installed
+from tap.run_loading_function import run_loading_function
+from tap.message import message
 
 from apt_pkg import CURSTATE_INSTALLED
 
 
-def upgrade():
-    get_editor_name()
-
+def _upgrade():
     for i in cfg.apt_cache.packages:
         if i.current_state != CURSTATE_INSTALLED:
             continue
@@ -30,5 +30,12 @@ def upgrade():
                 cfg.mpr_packages += [rpc_data["PackageBase"]]
 
     cfg.mpr_packages = list(set(cfg.mpr_packages))
+
+
+def upgrade():
+    get_editor_name()
+
+    msg = message.info("Calculating upgrade...", newline=False, value_return=True)
+    run_loading_function(msg, _upgrade)
 
     _run_pre_transaction()
