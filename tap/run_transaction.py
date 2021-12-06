@@ -139,7 +139,6 @@ def run_transaction():
     if cfg.mpr_packages != []:
         # Start building packages.
         message.info("Building packages...")
-        failed_builds = []
         built_packages = []
 
         for pkgbase in cfg.mpr_packages:

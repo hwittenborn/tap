@@ -1,5 +1,6 @@
+from operator import eq, ge, gt, le, lt
+
 from apt_pkg import version_compare
-from operator import lt, le, eq, ge, gt
 
 
 def check_version(ver1, comparison_operator, ver2):

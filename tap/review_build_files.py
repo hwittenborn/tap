@@ -26,7 +26,6 @@ def review_build_files():
             if response == "s":
                 message.warning("Skipping build file review for all packages.")
                 skip_all_build_files = True
-                check_files = False
                 break
 
             elif response == "n":

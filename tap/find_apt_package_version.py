@@ -50,15 +50,15 @@ def find_apt_package_version(package_object, operator, specified_version):
     for db_version in versions:
         version_result = version_compare(db_version, specified_version)
 
-        if compare_function(version_result, 0) == True:
+        if compare_function(version_result, 0) is True:
             version_state = "INSTALLABLE"
             break
 
     # If so, check if specified version is already installed.
-    if version_state == "INSTALLABLE" and package_installed == True:
+    if version_state == "INSTALLABLE" and package_installed is True:
         version_result = version_compare(installed_version, specified_version)
 
-        if compare_function(version_result, 0) == True:
+        if compare_function(version_result, 0) is True:
             version_state = "INSTALLED"
 
     return version_state

@@ -48,7 +48,9 @@ def clone_packages():
 
     for i in cfg.mpr_packages:
         proc = subprocess.run(
-            ["chown", "-Rh", f"{cfg.build_user}", "--", i], stdout=DEVNULL, stderr=PIPE
+            ["chown", "-Rh", f"{cfg.build_user}", "--", i],
+            stdout=DEVNULL,
+            stderr=PIPE,
         )
 
         if proc.returncode != 0:

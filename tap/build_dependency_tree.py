@@ -27,7 +27,8 @@ def _build_dependency_tree(**kwargs):
 
     if missing_deps != []:
         msg = message.error(
-            "The following dependencies were unable to be found:", value_return=True
+            "The following dependencies were unable to be found:",
+            value_return=True,
         )
         for i in missing_deps:
             msg += message.error2(i, value_return=True)

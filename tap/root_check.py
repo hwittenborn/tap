@@ -22,7 +22,10 @@ def root_check():
     )
 
     if command.returncode != 0:
-        message("error", f"Couldn't obtain permissions to run under UID '{sudo_uid}'.")
+        message(
+            "error",
+            f"Couldn't obtain permissions to run under UID '{sudo_uid}'.",
+        )
         exit(1)
 
     cfg.build_user = sudo_uid

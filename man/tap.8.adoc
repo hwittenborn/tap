@@ -21,7 +21,7 @@ tap - MPR in your pocket
 Items should generally be self-explanable after viewing the options under the help menu for each command (which are viewable via *tap* _command_ *--help*).
 
 == DESCRIPTION
-*Tap* is a feature-rich MPR helper that aims to be a drop-in replacement for *APT*(8). *Tap* provides access to almost every command accessible by *apt*, with MPR functionality intertwined into said commands.
+*Tap* is a feature-rich MPR helper that aims to be a drop-in replacement for *APT*(8). *Tap* provides access to almost every command accessible by *apt*, with MPR functionality integrated directly into said commands.
 
 *install* _package_ ...::
 Installs the specified packages onto the system.

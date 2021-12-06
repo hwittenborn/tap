@@ -1,10 +1,10 @@
 from tap import cfg
-from apt_pkg import CURSTATE_INSTALLED
-from tap.utils import is_installed
 from tap.check_version import check_version
-from tap.set_mpr_dependencies import set_mpr_dependencies
-from tap.install import _run_pre_transaction
 from tap.get_editor_name import get_editor_name
+from tap.install import _run_pre_transaction
+from tap.utils import is_installed
+
+from apt_pkg import CURSTATE_INSTALLED
 
 
 def upgrade():

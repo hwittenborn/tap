@@ -1,18 +1,12 @@
-import json
-import os
 import subprocess
-from datetime import datetime
-
-import requests
-from tap import cfg
 from os import get_terminal_size
+
+from tap import cfg
+from tap.check_version import check_version
 from tap.colors import colors
 from tap.message import message
-from tap.read_mpr_cache import read_mpr_cache
 from tap.run_loading_function import run_loading_function
 from tap.utils import is_installed
-from apt_pkg import INSTSTATE_OK, TagFile
-from tap.check_version import check_version
 
 
 def _get_apt_package_descriptions():
@@ -143,11 +137,13 @@ def search():
     if ("--mpr-only" not in cfg.options) and (
         not cfg.config_data["search"]["mpr_only"]
     ):
-        if (not "--pkgname-only" in cfg.options) and (
+        if ("--pkgname-only" not in cfg.options) and (
             not cfg.config_data[cfg.operation]["pkgname_only"]
         ):
             msg = message.info(
-                "Reading package descriptions...", newline=False, value_return=True
+                "Reading package descriptions...",
+                newline=False,
+                value_return=True,
             )
             apt_package_descriptions = run_loading_function(
                 msg, _get_apt_package_descriptions

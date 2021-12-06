@@ -1,8 +1,7 @@
-from tap.colors import colors
-from tap.exceptions import UnknownPackage
-from tap.message import message
 from tap import cfg
-from apt_pkg import TagFile, CURSTATE_INSTALLED
+from tap.message import message
+
+from apt_pkg import CURSTATE_INSTALLED, TagFile
 
 
 def _is_integer(arg):

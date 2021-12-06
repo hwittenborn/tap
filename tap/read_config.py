@@ -1,6 +1,7 @@
 import configparser
-from tap import cfg
 from os.path import exists
+
+from tap import cfg
 from tap.message import message
 
 _required_keys = ["remove", "search"]
@@ -60,7 +61,9 @@ def read_config():
 
     for item in _required_keys:
         if item not in config_dict:
-            msg = message.warning2(f"Missing toplevel item '{i}'.", value_return=True)
+            msg = message.warning2(
+                f"Missing toplevel item '{item}'.", value_return=True
+            )
             bad_config_reasons += [msg]
             cfg.config_data[item] = _default_config[item]
 

@@ -1,11 +1,11 @@
 import json
-import apt_pkg
+
 import requests
 from tap import cfg
+from tap.apt_fetch_packages import apt_fetch_packages
 from tap.exceptions import newline_error_exception
 from tap.message import message
 from tap.run_loading_function import run_loading_function
-from tap.apt_fetch_packages import apt_fetch_packages
 
 
 def _update_apt():

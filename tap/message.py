@@ -1,5 +1,6 @@
+from sys import stderr, stdout
+
 from tap.colors import colors
-from sys import stdout, stderr
 
 
 def _return_message(message, file, **kwargs):

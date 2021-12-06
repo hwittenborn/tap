@@ -40,7 +40,9 @@ def _run_pre_transaction():
                 exit(1)
 
             msg = message.info(
-                "Removing old build directory...", value_return=True, newline=False
+                "Removing old build directory...",
+                value_return=True,
+                newline=False,
             )
             run_loading_function(msg, rmtree, build_dir, onerror=builddir_del_error)
 
@@ -98,11 +100,15 @@ def install():
 
         elif available_apt and available_mpr:
             msg = message.info(
-                f"Package '{i}' is available from multiple sources:", value_return=True
+                f"Package '{i}' is available from multiple sources:",
+                value_return=True,
             )
 
             response = get_user_selection(
-                msg, [f"APT", f"MPR"], msg2_function=message.info2, multi_option=False
+                msg,
+                [f"APT", f"MPR"],
+                msg2_function=message.info2,
+                multi_option=False,
             )
 
             if response == "APT":
