@@ -3,12 +3,12 @@ set -ex
 mpr_fingerprint='SHA256:TQtnFwjBwpDOHnHTaANeudpXVmomlYo6Td/8T51FA/w'
 
 # SSH configuration
-rm -rf '/root/.ssh/' || true
-mkdir -p '/root/.ssh/'
+rm -rf "${HOME}/.ssh/" || true
+mkdir -p "${HOME}/.ssh/"
 
-echo "${ssh_key}" > '/root/.ssh/ssh_key'
-chmod 400 /root/.ssh/MPR /root/.ssh/known_hosts
-printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile /root/.ssh/ssh_key\n" | tee /root/.ssh/config
+echo "${ssh_key}" > "${HOME}/.ssh/ssh_key"
+chmod 400 "${HOME}/.ssh/ssh_key" "${HOME}/.ssh/known_hosts"
+printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile ${HOME}/.ssh/ssh_key\n" | tee "${HOME}/.ssh/config"
 
 SSH_HOST="${mpr_url}" \
 SSH_EXPECTED_FINGERPRINT="${mpr_fingerprint}" \
