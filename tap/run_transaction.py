@@ -14,6 +14,7 @@ from tap.parse_srcinfo import parse_srcinfo
 from tap.review_build_files import review_build_files
 from tap.utils import is_installed
 
+
 def _install_apt_packages(**kwargs):
     show_to_build = kwargs.get("show_to_build", True)
 
@@ -41,12 +42,12 @@ def _install_apt_packages(**kwargs):
             to_remove += [i.name]
             if i.essential:
                 to_remove_essential += [i.name]
-    
+
     for i in cfg.mpr_packages:
         if is_installed(i) is not False:
             to_upgrade += [i]
         else:
-            to_install += [i]
+            to_apt_install += [i]
 
     for i in [to_apt_install, to_upgrade, to_downgrade, to_remove]:
         i.sort()

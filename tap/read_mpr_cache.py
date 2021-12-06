@@ -5,6 +5,7 @@ from tap import cfg
 from tap.message import message
 from tap.exceptions import newline_error_exception
 
+
 class _create_pkg_object:
     def __init__(self, json_dict):
         self.pkgbase = json_dict["PackageBase"]
@@ -27,23 +28,39 @@ class read_mpr_cache:
         filename = f"/var/cache/{cfg.application_name}/mpr-cache.json"
 
         if not exists(filename):
-            msg = message.error("Repository cache for the MPR doesn't currently exist.", value_return=True)
-            msg += message.error(f"Run 'sudo {cfg.application_name} update' and try again.", value_return=True)
+            msg = message.error(
+                "Repository cache for the MPR doesn't currently exist.",
+                value_return=True,
+            )
+            msg += message.error(
+                f"Run 'sudo {cfg.application_name} update' and try again.",
+                value_return=True,
+            )
             raise newline_error_exception(msg)
 
         with open(filename, "r") as file:
             data = file.read()
 
         if data.strip() == "":
-            msg = message.error("Repository cache for the MPR is empty.", value_return=True)
-            msg += message.error(f"Run 'sudo {cfg.application_name} update' and try again.", value_return=True)
+            msg = message.error(
+                "Repository cache for the MPR is empty.", value_return=True
+            )
+            msg += message.error(
+                f"Run 'sudo {cfg.application_name} update' and try again.",
+                value_return=True,
+            )
             raise newline_error_exception(msg)
 
         try:
             data = json.loads(data)
         except json.decoder.JSONDecodeError:
-            msg = message.error("Error parsing MPR repository cache.", value_return=True)
-            msg += message.error(f"Run 'sudo {cfg.application_name} update' and try again.", value_return=True)
+            msg = message.error(
+                "Error parsing MPR repository cache.", value_return=True
+            )
+            msg += message.error(
+                f"Run 'sudo {cfg.application_name} update' and try again.",
+                value_return=True,
+            )
             raise newline_error_exception(msg)
 
         self.package_bases = []
