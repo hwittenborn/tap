@@ -18,7 +18,7 @@ makedeb -si
 ## Usage
 Users of the APT commandline tools will find most options readily available to them. All available commands can be found via `tap --help` after installation.
 
-Several commands have specific options available to them, those can be seen by running `tap command --help`.
+Several commands have specific options available to them, those can be seen by running `tap *command* --help`.
 
 ## Support
 Issues with using Tap should be made inside of the project's [issue tracker](/hwittenborn/tap/issues).
