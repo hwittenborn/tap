@@ -11,7 +11,6 @@ class _create_pkg_object:
         self.pkgname = json_dict["Name"]
         self.version = json_dict["Version"]
         self.description = json_dict["Description"]
-        self.url = json_dict["URL"]
         self.numvotes = json_dict["NumVotes"]
         self.popularity = json_dict["Popularity"]
         self.outofdate = json_dict["OutOfDate"]
@@ -19,8 +18,8 @@ class _create_pkg_object:
         self.firstsubmitted = json_dict["FirstSubmitted"]
         self.lsatmodified = json_dict["LastModified"]
         self.urlpath = json_dict["URLPath"]
-        self.license = json_dict["License"]
-        self.keywords = json_dict["Keywords"]
+        self.license = json_dict.get("License", [])
+        self.keywords = json_dict.get("Keywords", [])
 
 
 class read_mpr_cache:

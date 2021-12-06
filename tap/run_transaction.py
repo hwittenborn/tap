@@ -12,7 +12,7 @@ from tap.message import message
 from tap.parse_control import parse_control
 from tap.parse_srcinfo import parse_srcinfo
 from tap.review_build_files import review_build_files
-
+from tap.utils import is_installed
 
 def _install_apt_packages(**kwargs):
     show_to_build = kwargs.get("show_to_build", True)
@@ -41,6 +41,12 @@ def _install_apt_packages(**kwargs):
             to_remove += [i.name]
             if i.essential:
                 to_remove_essential += [i.name]
+    
+    for i in cfg.mpr_packages:
+        if is_installed(i) is not False:
+            to_upgrade += [i]
+        else:
+            to_install += [i]
 
     for i in [to_apt_install, to_upgrade, to_downgrade, to_remove]:
         i.sort()
@@ -63,7 +69,7 @@ def _install_apt_packages(**kwargs):
 
     generate_apt_styled_text(
         "The following packages are going to be installed:",
-        cfg.mpr_packages + to_apt_install,
+        to_apt_install,
     )
     generate_apt_styled_text(
         "The following additional packages are going to be installed:",

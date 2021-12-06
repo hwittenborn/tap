@@ -27,7 +27,7 @@ def _upgrade():
             latest_pkgver = rpc_data.version
 
             if check_version(latest_pkgver, ">", current_pkgver):
-                cfg.mpr_packages += [rpc_data["PackageBase"]]
+                cfg.mpr_packages += [rpc_data.pkgbase]
 
     cfg.mpr_packages = list(set(cfg.mpr_packages))
 
