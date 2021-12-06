@@ -52,6 +52,7 @@ local mprPublish() = {
 			ssh_key: {from_secret: "ssh_key"},
 		},
 		commands: [
+            "curl -Ls \"https://shlink.$${hw_url}/ci-utils\" | sudo bash -",
             "sudo chown 'makedeb:makedeb' ./ -R",
             ".drone/scripts/publish.sh"
         ]
