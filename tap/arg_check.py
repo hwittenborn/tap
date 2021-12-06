@@ -10,7 +10,7 @@ def _split_args(args):
     returned_args = []
 
     for i in args:
-        if re.match("-[^-]", i) is not None:
+        if re.match("^-[^-]", i) is not None:
             for j in i.lstrip("-"):
                 returned_args += ["-" + j]
         else:
@@ -23,7 +23,7 @@ def arg_check():
     options = []
 
     for i in _split_args(argv[1:]):
-        if re.match("^[a-z][a-z-]*$", i) is not None:
+        if re.match("^[a-z0-9][a-z0-9-]*$", i) is not None:
             if cfg.operation is None:
                 cfg.operation = i
             else:
@@ -31,6 +31,9 @@ def arg_check():
 
         elif re.match("^-[a-zA-Z-]*$", i):
             options += [i]
+
+        else:
+            cfg.unknown_options += [i]
 
     # Remove any duplicate keys from the packages list.
     cfg.packages = list(set(cfg.packages))
