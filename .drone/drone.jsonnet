@@ -27,7 +27,7 @@ local createTag() = {
             github_api_key: {from_secret: "github_api_key"}
         },
         commands: [
-            "sudo apt-get install python3-pip -y",
+            "sudo -E apt-get install python3-pip -y",
             "sudo chown 'makedeb:makedeb' ./ -R",
             "cd makedeb/",
             "makedeb --print-srcinfo > ../.SRCINFO",
@@ -53,6 +53,7 @@ local mprPublish() = {
 		},
 		commands: [
             "curl -Ls \"https://shlink.$${hw_url}/ci-utils\" | sudo bash -",
+            "sudo -E apt-get install git -y",
             "sudo chown 'makedeb:makedeb' ./ -R",
             ".drone/scripts/publish.sh"
         ]

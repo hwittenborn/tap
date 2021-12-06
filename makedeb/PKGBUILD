@@ -1,6 +1,6 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=tap
-pkgver=0.28.2
+pkgver=0.28.3
 pkgrel=1
 pkgdesc="MPR in your pocket"
 arch=('any')
@@ -10,7 +10,7 @@ license=('GPL3')
 control_fields=("MPR-Package: ${pkgname}")
 url="https://github.com/hwittenborn/tap"
 
-source=("git+${url}/#tag=v${pkgver}")
+source=("git+${url}/#tag=v${pkgver}-${pkgrel}")
 sha256sums=('SKIP')
 
 prepare() {
