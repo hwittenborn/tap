@@ -29,7 +29,9 @@ local createTag() = {
         commands: [
             "sudo apt-get install python3-pip -y",
             "sudo chown 'makedeb:makedeb' ./ -R",
-            "makedeb --print-srcinfo > .SRCINFO",
+            "cd makedeb/",
+            "makedeb --print-srcinfo > ../.SRCINFO",
+            "cd ../",
             "pip install -r .drone/scripts/requirements.txt",
             ".drone/scripts/create-release.py"
         ]
