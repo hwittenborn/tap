@@ -1,21 +1,28 @@
-<h1 align="center">Tap</h2>
+# Tap
+![build status](https://img.shields.io/drone/build/hwittenborn/tap/main?logo=drone&server=https%3A%2F%2Fdrone.hunterwittenborn.com)
 
 ## Overview
-Tap is a second-generation MPR helper written in Python, being the successor to [mpm](https://github.com/hwittenborn/mpm). It provides numerous benefits over mpm, including a plethora of more features, and an overall smoother and snappier experience.
+Tap is a feature-rich MPR helper that aims to be a drop-in replacement for APT. Tap provides access to almost every command accessible by `apt`, with MPR functionality integrated directly into said commands.
 
-Tap currently contains the following features:
+## Installation
+If you have an existing MPR helper, you can simply install Tap from there via the `tap` package.
 
-- Installing
-- Updating
-- Searching
-- Listing locally installed packages from the MPR
-- Installing dependencies from the MPR (not yet in the deployed release)
+Otherwise, you can install Tap manually from the MPR:
 
-There is also a roadmap [here](https://github.com/hwittenborn/tap/issues/7) that is tracking the development to a 1.0.0 release, which somewhat outlines Tap's current major features.
+```sh
+git clone 'https://mpr.hunterwittenborn.com/tap'
+cd tap/
+makedeb -si
+```
 
-Tap is currently in beta, and is also in very rapid development. Likewise, bugs are almost guaranteed to crop up somewhere, and you should avoid Tap for the time being if you're expecting a smooth experience 100% of the time.
+## Usage
+Users of the APT commandline tools will find most options readily available to them. All available commands can be found via `tap --help` after installation.
 
-## Installation and usage
-Tap can be installed [directly from the MPR](https://dur.hunterwittenborn.com/packages/tap).
+Several commands have specific options available to them, those can be seen by running `tap *command* --help`.
 
-Help with available commands can be found after installation with `tap --help`.
+## Support
+Issues with using Tap should be made inside of the project's [issue tracker](/hwittenborn/tap/issues).
+
+If a package fails to build with Tap, you should try building the package with makedeb before posting issues to the package maintainer or the makedeb issue tracker, as the issue may be rooted in Tap itself.
+
+If you prefer a chatroom for obtaining support or just want to chat, Tap has a Matrix room located at [#tap:hunterwittenborn.com](https://matrix.to/#/#tap:hunterwittenborn.com).

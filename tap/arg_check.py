@@ -1,116 +1,81 @@
-def arg_check(argument_list, application_name, application_version):
-	import re
-	import os
+import re
+from sys import argv
 
-	from tap.help_menu   import  help_menu     # REMOVE AT PACKAGING
-	from tap.root_check  import  root_check    # REMOVE AT PACKAGING
-	from tap.message     import  message       # REMOVE AT PACKAGING
+from tap import cfg
+from tap.help_menu import help_menu
+from tap.message import message
 
-	if len(argument_list) == 0:
-		help_menu(application_name, application_version)
-		quit(0)
 
-	number = 0
+def _split_args(args):
+    returned_args = []
 
-	argument_value = argument_list[number]
+    for i in args:
+        if re.match("-[^-]", i) is not None:
+            for j in i.lstrip("-"):
+                returned_args += ["-" + j]
+        else:
+            returned_args += [i]
 
-	# Process first specified option
-	if argument_value == "-h" or argument_value == "--help":
-		help_menu(application_name, application_version)
-		quit(0)
+    return returned_args
 
-	elif argument_value == "-V" or argument_value == "--version":
-		print(f"{application_name} ({application_version})")
-		quit(0)
 
-	elif argument_value == "install":
-		root_check()
-		operation = "install"
+def arg_check():
+    options = []
 
-	elif argument_value == "update" or argument_value == "upgrade":
-		root_check()
-		operation = "update"
+    for i in _split_args(argv[1:]):
+        if re.match("^[a-z][a-z-]*$", i) is not None:
+            if cfg.operation is None:
+                cfg.operation = i
+            else:
+                cfg.packages += [i]
 
-	elif argument_value == "search":
-		operation = "search"
+        elif re.match("^-[a-zA-Z-]*$", i):
+            options += [i]
 
-	elif argument_value == "clone":
-		operation = "clone"
+    # Remove any duplicate keys from the packages list.
+    cfg.packages = list(set(cfg.packages))
 
-	elif argument_value == "list-packages":
-		operation = "list-packages"
+    if cfg.operation is None:
+        help_menu()
 
-	else:
-		message("error", f"Unknown command '{argument_value}'")
-		quit(1)
+    elif cfg.operation not in cfg.available_commands:
+        message.error(f"Invalid command '{cfg.operation}'.")
+        message.error(f"See '{cfg.application_name} --help' for available commands.")
+        exit(1)
 
-	# Specifying arrays (i.e. 'hi[1]') starts at 0 for the first argument, but
-	# len() is going to start at 1 for counting, so we need to subtract one.
-	argument_list_length = len(argument_list) - 1
+    # Process sub-command arguments.
+    opts = cfg.command_options[cfg.operation]
+    available_options = opts[0]
+    shortopt_mappings = opts[1]
 
-	# Add 1 to 'number' as we're going to start processing the *second*
-	# specified option.
-	number = number + 1
+    for i in options:
+        if i in available_options:
+            cfg.options += [i]
+        elif i in shortopt_mappings:
+            cfg.options += [shortopt_mappings[i]]
+        else:
+            cfg.unknown_options += [i]
 
-	packages_temp = []
-	argument_options = []
+    if cfg.unknown_options != []:
+        for i in cfg.unknown_options:
+            message.error(f"Unknown option '{i}'.")
+        message.error(
+            f"See '{cfg.application_name} {cfg.operation} --help' for available options."
+        )
+        exit(1)
 
-	# Set options from environment variables when set. We do this now as we
-	# want said options to be able to be overwritten by CLI arguments.
-	for i in ["min-info", "skip-less-pipe", "rev-alpha"]:
-		env_string = "TAP_MPR_" + i.upper().replace("-", "_")
+    for i in ("-h", "--help"):
+        if i in cfg.options:
+            help_menu()
 
-		if os.getenv(env_string) != None:
-			argument_options += [i]
-
-	# Loop through all remaining specified options
-	while number <= argument_list_length:
-
-		# Check for options ('-*' or '--*' strings)
-		if argument_list[number] == "-e" or argument_list[number] == "--min-info":
-			argument_options += ["min-info"]
-
-		elif argument_list[number] == "-h" or argument_list[number] == "--help":
-			help_menu(application_name, application_version)
-			quit(0)
-
-		elif argument_list[number] == "-L" or argument_list[number] == "--skip-less-pipe":
-			argument_options += ["no-less-pipe"]
-
-		elif argument_list[number] == "-R" or argument_list[number] == "--rev-alpha":
-			argument_options += ["rev-alpha"]
-
-		elif argument_list[number] == "-V" or argument_list[number] == "--version":
-				print(f"{application_name} ({application_version})")
-				quit(0)
-
-		elif bool(re.match('^-.*', argument_list[number])) == True:
-			message("error", f"Unknown option '{argument_list[number]}'")
-			bad_argument_option = True
-
-		# Everything else is a package
-		else:
-			packages_temp += [argument_list[number]]
-
-		number = number + 1
-
-	try: bad_argument_option
-	except NameError: bad_argument_option = False
-
-	# Post-argument checks
-	if bad_argument_option == True:
-		quit(1)
-
-	elif ( operation == "update" or operation == "list-packages" ) and len(packages_temp) != 0:
-		message("error", f"Packages cannot be specified when using the {operation} command.")
-		quit(1)
-
-	elif (operation == "install" or operation == "search" or operation == "clone" ) and len(packages_temp) == 0:
-		message("error", "No package was specified.")
-		quit(1)
-
-	# Get unique list of specified packages
-	packages = sorted(list(set(packages_temp)))
-
-	# Return argument list and specified packages
-	return [operation, packages, argument_options]
+    # Check if a command recieved argument when it was/wasn't supposed to.
+    if (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):
+        message.error(f"Command '{cfg.operation}' requires arguments.")
+        exit(1)
+    elif (
+        (cfg.operation not in cfg.requires_arguments)
+        and (cfg.operation not in cfg.optional_arguments)
+        and (cfg.packages != [])
+    ):
+        message.error(f"Command '{cfg.operation}' doesn't take arguments.")
+        exit(1)

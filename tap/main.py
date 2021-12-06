@@ -1,44 +1,68 @@
 #!/usr/bin/env python3
+from tap import cfg
+from tap.apt_fetch_packages import apt_fetch_packages
+from tap.arg_check import arg_check
+from tap.autoremove import autoremove
+from tap.install import install
+from tap.list import list
+from tap.message import message
+from tap.read_config import read_config
+from tap.read_mpr_cache import read_mpr_cache
+from tap.remove import remove
+from tap.root_check import root_check
+from tap.run_loading_function import run_loading_function
+from tap.search import search
+from tap.update import update
+from tap.upgrade import upgrade
+
+import apt_pkg
+
 
 def main():
-    # Modules
-    import os
-    import sys
-    import re
-    import subprocess
+    arg_check()
+    read_config()
 
-    from tap.split_args             import  split_args             # REMOVE AT PACKAGING
-    from tap.arg_check              import  arg_check              # REMOVE AT PACKAGING
-    from tap.install_package        import  install_package        # REMOVE AT PACKAGING
-    from tap.update_package         import  update_package         # REMOVE AT PACKAGING
-    from tap.search_package         import  search_package         # REMOVE AT PACKAGING
-    from tap.list_packages          import  list_packages          # REMOVE AT PACKAGING
+    if cfg.operation in cfg.requires_sudo:
+        root_check()
 
-    # Variables we need to function
-    application_name = "tap"
-    application_version = os.environ.get("TAP_PKGVER", "git")
-    mpr_url = "mpr.hunterwittenborn.com"
-    os_codename = subprocess.run(["lsb_release", "-cs"],
-                                 stdout=subprocess.PIPE,
-                                 universal_newlines=True).stdout.strip()
+    # Generate APT cache if we're going to need it.
+    if cfg.operation in cfg.requires_apt_cache:
+        apt_pkg.init()
 
-    # Argument check
-    argument_list = split_args(sys.argv[1:])
-    arg_check_results = arg_check(argument_list, application_name, application_version)
+        if "--quiet" not in cfg.options:
+            msg = message.info("Reading APT cache...", value_return=True, newline=False)
+            cfg.apt_cache = run_loading_function(msg, apt_pkg.Cache, None)
+        else:
+            cfg.apt_cache = apt_pkg.Cache(None)
 
-    operation = arg_check_results[0]
-    packages = arg_check_results[1]
-    argument_options = arg_check_results[2]
+        cfg.apt_depcache = apt_pkg.DepCache(cfg.apt_cache)
+        cfg.apt_resolver = apt_pkg.ProblemResolver(cfg.apt_depcache)
+        cfg.apt_pkgman = apt_pkg.PackageManager(cfg.apt_depcache)
+        cfg.apt_acquire = apt_pkg.Acquire(apt_fetch_packages())
+        cfg.apt_sourcelist = apt_pkg.SourceList()
+        cfg.apt_sourcelist.read_main_list()
+        cfg.apt_pkgrecords = apt_pkg.PackageRecords(cfg.apt_cache)
 
-    # Run commands
-    if operation == "install":
-        install_package(mpr_url, packages, "installed", application_name, application_version, os_codename)
+    # Read MPR cache if we're going to need it.
+    if cfg.operation in cfg.requires_mpr_cache:
+        if "--quiet" not in cfg.options:
+            msg = message.info("Reading MPR cache...", value_return=True, newline=False)
+            cfg.mpr_cache = run_loading_function(msg, read_mpr_cache)
+        else:
+            cfg.mpr_cache = read_mpr_cache()
 
-    elif operation == "update":
-        update_package(mpr_url, application_name, application_version, os_codename)
-
-    elif operation == "search":
-        search_package(mpr_url, packages, application_name, application_version, argument_options)
-
-    elif operation == "list-packages":
-        list_packages(argument_options)
+    # Run commands.
+    if cfg.operation == "install":
+        install()
+    elif cfg.operation == "update":
+        update()
+    elif cfg.operation == "upgrade":
+        upgrade()
+    elif cfg.operation == "remove":
+        remove()
+    elif cfg.operation == "autoremove":
+        autoremove()
+    elif cfg.operation == "search":
+        search()
+    elif cfg.operation == "list":
+        list()

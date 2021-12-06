@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
-set -x
-set -e
-
-# User/Permission configuration
-useradd user
-chown 'user:user' * -R
+set -ex
+mpr_fingerprint='SHA256:TQtnFwjBwpDOHnHTaANeudpXVmomlYo6Td/8T51FA/w'
 
 # SSH configuration
 rm -rf '/root/.ssh/' || true
 mkdir -p '/root/.ssh/'
 
-echo "${known_hosts}" > '/root/.ssh/known_hosts'
-echo "${ssh_key}" > '/root/.ssh/MPR'
-
+echo "${ssh_key}" > '/root/.ssh/ssh_key'
 chmod 400 /root/.ssh/MPR /root/.ssh/known_hosts
+printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile /root/.ssh/ssh_key\n" | tee /root/.ssh/config
 
-printf "Host ${mpr_url}\n  Hostname ${mpr_url}\n  IdentityFile /root/.ssh/MPR\n" | tee /root/.ssh/config
+SSH_HOST="${mpr_url}" \
+SSH_EXPECTED_FINGERPRINT="${mpr_fingerprint}" \
+SET_PERMS="true" \
+get-ssh-key
 
-# Git Shit
+# Git stuff.
 git config --global user.name "Kavplex Bot"
 git config --global user.email "kavplex@hunterwittenborn.com"
 
@@ -25,12 +23,8 @@ git clone "ssh://mpr@${mpr_url}/tap.git" "tap-mpr"
 
 rm "tap-mpr/PKGBUILD"
 cp "makedeb/PKGBUILD" "tap-mpr/PKGBUILD"
-
-chown user:user "tap-mpr" -R
-
 cd "tap-mpr"
-
-sudo -u user -- makedeb --printsrcinfo | tee .SRCINFO
+makedeb --printsrcinfo | tee .SRCINFO
 
 package_version="$(cat .SRCINFO | grep 'pkgver' | awk -F ' = ' '{print $2}')"
 package_relationship="$(cat .SRCINFO | grep 'pkgrel' | awk -F ' = ' '{print $2}')"
