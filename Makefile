@@ -11,3 +11,7 @@ install:
 	SOURCE_DATE_EPOCH='$(MAN_SOURCE_DATE_EPOCH)' asciidoctor -b manpage ./man/tap.8.adoc -o '$(DESTDIR)/usr/share/man8/tap.8'
 	install -Dm 555 'completions/tap.bash' '$(DESTDIR)/usr/share/bash-completion/completions/tap'
 	install -Dm 644 'tap.cfg' '$(DESTDIR)/etc/tap.cfg'
+	
+	mkdir -p '$(DESTDIR)/var/cache/tap/'
+	touch '$(DESTDIR)/var/cache/tap/mpr-cache.json'
+	chmod 644 '$(DESTDIR)/var/cache/tap/mpr-cache.json'
