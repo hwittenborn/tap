@@ -27,7 +27,7 @@ local createTag() = {
             github_api_key: {from_secret: "github_api_key"}
         },
         commands: [
-            "sudo apt install python3-pip",
+            "sudo apt-get install python3-pip -y",
             "sudo chown 'makedeb:makedeb' ./ -R",
             "makedeb --print-srcinfo > .SRCINFO",
             "pip install -r .drone/scripts/requirements.txt",
