@@ -18,19 +18,15 @@ def _get_apt_package_descriptions():
             continue
 
         # apt_pkg.Cache().packages includes packages not available on our architecture, but we don't want those.
+        # apt_pkg.Cache().packages also seems to say packages (even ones that aren't available for our architecture) have versions available. We need to check if the apt_pkg.Cache()[pkgname] version has versions available.
         try:
-            cfg.apt_cache[i.name]
+            if not cfg.apt_cache[i.name].has_versions:
+                continue
         except KeyError:
             continue
 
         pkgbase = cfg.apt_depcache.get_candidate_ver(i)
-
-        try:
-            cfg.apt_pkgrecords.lookup(pkgbase.file_list[0])
-        except AttributeError:
-            cfg.apt_cache[i.name]
-            exit()
-
+        cfg.apt_pkgrecords.lookup(pkgbase.file_list[0])
         pkgname = i.name
         pkgdesc = cfg.apt_pkgrecords.short_desc
 
@@ -52,11 +48,7 @@ def _get_latest_version(pkgname):
     if pkgname in cfg.mpr_cache.package_bases:
         version_list += [cfg.mpr_cache.package_dicts[pkgname].version]
 
-    try:
-        returned_version = version_list[0]
-    except IndexError:
-        print(pkgname)
-        exit(1)
+    returned_version = version_list[0]
 
     for i in version_list:
         if check_version(i, ">", returned_version):
@@ -67,12 +59,21 @@ def _get_latest_version(pkgname):
 
 def _get_description(pkgname):
     try:
-        cache_version = cfg.apt_depcache.get_candidate_ver(cfg.apt_cache[pkgname])
+        cache_pkg = cfg.apt_cache[pkgname]
+
+        # Package won't have any descriptions to pull from if it has no available versions.
+
+        if not cache_pkg.has_versions:
+            return None
+
+        cache_version = cfg.apt_depcache.get_candidate_ver(cache_pkg)
         cfg.apt_pkgrecords.lookup(cache_version.file_list[0])
         return cfg.apt_pkgrecords.short_desc
+
     except KeyError:
         if pkgname not in cfg.mpr_cache.package_names:
             return None
+
         return cfg.mpr_cache.package_dicts[pkgname].description
 
 
@@ -124,12 +125,22 @@ def _generate_results():
         if index < list_length:
             results_string += "\n"
 
-    if (len(results_string.splitlines()) > get_terminal_size().lines) and (
+    return results_string
+
+
+def _print_results():
+    if "--quiet" not in cfg.options:
+        msg = message.info("Generating results...", value_return=True, newline=False)
+        results = run_loading_function(msg, _generate_results)
+    else:
+        results = _generate_results()
+
+    if (len(results.splitlines()) > get_terminal_size().lines) and (
         "--skip-less-pipe" not in cfg.options
     ):
-        subprocess.run(["less", "-r"], input=results_string.encode())
+        subprocess.run(["less", "-r"], input=results.encode())
     else:
-        print(results_string, end="")
+        print(results, end="")
 
 
 def search():
@@ -172,5 +183,5 @@ def search():
                 if (pkg in mpr_pkg) or (pkg in pkgdesc):
                     cfg.mpr_packages += [mpr_pkg]
 
-    # Generate results.
-    _generate_results()
+    # Print results.
+    _print_results()

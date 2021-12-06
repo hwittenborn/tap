@@ -116,6 +116,7 @@ apt_acquire = None
 apt_sourcelist = None
 apt_pkgrecords = None
 mpr_cache = None
+dpkg_status_file = None
 
 # APT exception errors.
 APT_BROKEN_PACKAGES = "E:Unable to correct problems, you have held broken packages."

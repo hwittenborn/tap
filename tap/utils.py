@@ -24,7 +24,10 @@ def is_installed(pkgname):
     if not installed:
         return False
 
-    with TagFile("/var/lib/dpkg/status") as file:
+    if cfg.dpkg_status_file is None:
+        cfg.dpkg_status_file = TagFile("/var/lib/dpkg/status")
+
+    with cfg.dpkg_status_file as file:
         for section in file:
             if section["Package"] == pkgname:
                 try:

@@ -4,7 +4,7 @@ from tap.apt_fetch_packages import apt_fetch_packages
 from tap.arg_check import arg_check
 from tap.autoremove import autoremove
 from tap.install import install
-from tap.list import list
+from tap.list import list_pkg
 from tap.message import message
 from tap.read_config import read_config
 from tap.read_mpr_cache import read_mpr_cache
@@ -65,4 +65,8 @@ def main():
     elif cfg.operation == "search":
         search()
     elif cfg.operation == "list":
-        list()
+        list_pkg()
+
+    # Close cached files if we opened them.
+    if cfg.dpkg_status_file is not None:
+        cfg.dpkg_status_file.close()

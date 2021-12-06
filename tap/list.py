@@ -1,9 +1,30 @@
 from tap import cfg
-from tap.search import _generate_results
+from tap.search import _print_results
 from tap.utils import is_installed
+from tap.message import message
+from tap.run_loading_function import run_loading_function
 
 
-def list():
+def _list_all_packages():
+    for i in cfg.apt_cache.packages:
+        # apt_pkg.Cache().packages includes packages not available on our architecture, but we don't want those.
+        # apt_pkg.Cache().packages also seems to say packages (even ones that aren't available for our architecture) have versions available. We need to check if the apt_pkg.Cache()[pkgname] version has versions available.
+        try:
+            if not cfg.apt_cache[i.name].has_versions:
+                continue
+        except KeyError:
+            continue
+
+        cfg.packages += [i.name]
+
+    for i in cfg.mpr_cache.package_bases:
+        cfg.packages += [i]
+
+    cfg.packages = list(set(cfg.packages))
+    cfg.packages.sort()
+
+
+def _process_packages():
     for pkg in cfg.packages:
         # Process APT listings.
         if pkg in cfg.apt_cache:
@@ -45,4 +66,21 @@ def list():
 
             cfg.mpr_packages += [pkg]
 
-    _generate_results()
+
+def list_pkg():
+    if cfg.packages == []:
+        if "--quiet" not in cfg.options:
+            msg = message.info(
+                "Fetching package names...", newline=False, value_return=True
+            )
+            run_loading_function(msg, _list_all_packages)
+        else:
+            _list_all_packages()
+
+    if "--quiet" not in cfg.options:
+        msg = message.info("Processing packages...", newline=False, value_return=True)
+        run_loading_function(msg, _process_packages)
+    else:
+        _process_packages()
+
+    _print_results()
