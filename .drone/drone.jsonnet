@@ -6,7 +6,10 @@ local runUnitTests() = {
     steps: [{
         name: "run-unit-tests",
         image: "proget.hunterwittenborn.com/docker/makedeb/makedeb:ubuntu-focal",
-        commands: [".drone/scripts/unit-tests.sh"]
+        commands: [
+        "sudo chown 'makedeb:makedeb' ./ -R",
+        ".drone/scripts/unit-tests.sh"
+        ]
     }]
 };
 
@@ -19,11 +22,14 @@ local createTag() = {
 
     steps: [{
         name: "create-release",
-        image: "python",
+        image: "proget.hunterwittenborn.com/docker/makedeb/makedeb:ubuntu-focal",
         environment: {
             github_api_key: {from_secret: "github_api_key"}
         },
         commands: [
+            "sudo apt install python3-pip",
+            "sudo chown 'makedeb:makedeb' ./ -R",
+            "makedeb --print-srcinfo > .SRCINFO",
             "pip install -r .drone/scripts/requirements.txt",
             ".drone/scripts/create-release.py"
         ]
@@ -43,7 +49,10 @@ local mprPublish() = {
 		environment: {
 			ssh_key: {from_secret: "ssh_key"},
 		},
-		commands: [".drone/scripts/publish.sh"]
+		commands: [
+            "sudo chown 'makedeb:makedeb' ./ -R",
+            ".drone/scripts/publish.sh"
+        ]
     }]
 };
 
