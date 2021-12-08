@@ -12,7 +12,6 @@ from tap.message import message
 from tap.parse_control import parse_control
 from tap.parse_srcinfo import parse_srcinfo
 from tap.review_build_files import review_build_files
-from tap.utils import is_installed
 
 
 def _install_apt_packages(**kwargs):
@@ -44,7 +43,7 @@ def _install_apt_packages(**kwargs):
                 to_remove_essential += [i.name]
 
     for i in cfg.mpr_packages:
-        if is_installed(i) is not False:
+        if cfg.dpkg_packages.get(i) is not None:
             to_upgrade += [i]
         else:
             to_apt_install += [i]

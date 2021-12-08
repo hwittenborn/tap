@@ -6,7 +6,6 @@ from tap.check_version import check_version
 from tap.colors import colors
 from tap.message import message
 from tap.run_loading_function import run_loading_function
-from tap.utils import is_installed
 
 
 def _get_apt_package_descriptions():
@@ -92,6 +91,11 @@ def _generate_results():
         if ("--pkgname-only" in cfg.options) or (
             cfg.config_data[cfg.operation]["pkgname_only"]
         ):
+            print(
+                "--pkgname-only" in cfg.options,
+                type(cfg.config_data[cfg.operation]["pkgname_only"]),
+            )
+            exit()
             results_string += f"{pkgname}\n"
             continue
 
@@ -100,16 +104,22 @@ def _generate_results():
 
         bracketed_strings = []
 
-        installed = is_installed(pkgname)
+        if cfg.dpkg_packages.get(pkgname) is not None:
+            if cfg.dpkg_packages[pkgname].get("MPR-Package") is None:
+                installed_mpr = False
+            else:
+                installed_mpr = True
+        else:
+            installed_mpr = None
 
-        if (pkgname in cfg.apt_cache) and (installed != "mpr"):
+        if (pkgname in cfg.apt_cache) and (not installed_mpr):
             bracketed_strings += [f"{colors.debian}APT{colors.normal}"]
         if pkgname in cfg.mpr_cache.package_names:
             bracketed_strings += [f"{colors.orange}MPR{colors.normal}"]
 
-        if installed == "apt":
+        if installed_mpr is False:
             bracketed_strings += [f"{colors.cyan}Installed-APT{colors.normal}"]
-        elif installed == "mpr":
+        elif installed_mpr is True:
             bracketed_strings += [f"{colors.cyan}Installed-MPR{colors.normal}"]
 
         if bracketed_strings == []:
@@ -120,7 +130,9 @@ def _generate_results():
         results_string += (
             f"{colors.apt_green}{pkgname}{colors.normal}/{pkgver}{bracketed_text}\n"
         )
-        results_string += f"  {pkgdesc}\n"
+
+        if pkgdesc is not None:
+            results_string += f"  {pkgdesc}\n"
 
         if index < list_length:
             results_string += "\n"

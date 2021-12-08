@@ -1,6 +1,5 @@
 from tap import cfg
 from tap.search import _print_results
-from tap.utils import is_installed
 from tap.message import message
 from tap.run_loading_function import run_loading_function
 
@@ -26,10 +25,16 @@ def _list_all_packages():
 
 def _process_packages():
     for pkg in cfg.packages:
+        if cfg.dpkg_packages.get(pkg):
+            if cfg.dpkg_packages[pkg].get("MPR-Package") is None:
+                installed = "apt"
+            else:
+                installed = "mpr"
+        else:
+            installed = False
+
         # Process APT listings.
         if pkg in cfg.apt_cache:
-            installed = is_installed(pkg)
-
             if ("--installed" in cfg.options) or (cfg.config_data["list"]["installed"]):
                 if installed is False:
                     continue
@@ -48,8 +53,6 @@ def _process_packages():
 
     for pkg in cfg.packages:
         if pkg in cfg.mpr_cache.package_names:
-            installed = is_installed(pkg)
-
             if ("--installed" in cfg.options) or (cfg.config_data["list"]["installed"]):
                 if installed is False:
                     continue

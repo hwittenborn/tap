@@ -10,7 +10,7 @@ from tap.message import message
 from tap.run_loading_function import run_loading_function
 from tap.run_transaction import run_transaction
 from tap.set_mpr_dependencies import set_mpr_dependencies
-from tap.utils import get_user_selection, is_installed
+from tap.utils import get_user_selection
 
 
 def _create_build_dirs():
@@ -80,13 +80,19 @@ def install():
         available_apt = False
         available_mpr = False
 
-        installed = is_installed(i)
+        # If the package is currently installed, ensure we only install it from the source it's already installed from (i.e. if from APT, don't allow the MPR package to be installed).
+        if i in cfg.dpkg_packages:
+            if cfg.dpkg_packages[i].get("MPR-Package") is None:
+                available_apt = True
+            else:
+                available_mpr = True
 
-        # Check installation sources.
-        if (installed != "mpr") and (i in cfg.apt_cache):
-            available_apt = True
-        if (installed == "mpr") or (i in cfg.mpr_cache.package_bases):
-            available_mpr = True
+        # Otherwise, just check what sources the package is available from.
+        else:
+            if i in cfg.apt_cache:
+                available_apt = True
+            if i in cfg.mpr_cache.package_bases:
+                available_mpr = True
 
         # Add to relevant package lists.
         if (not available_apt) and (not available_mpr):

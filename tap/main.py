@@ -14,6 +14,7 @@ from tap.run_loading_function import run_loading_function
 from tap.search import search
 from tap.update import update
 from tap.upgrade import upgrade
+from tap.read_dpkg_status_file import read_dpkg_status_file
 
 import apt_pkg
 
@@ -42,6 +43,7 @@ def main():
         cfg.apt_sourcelist = apt_pkg.SourceList()
         cfg.apt_sourcelist.read_main_list()
         cfg.apt_pkgrecords = apt_pkg.PackageRecords(cfg.apt_cache)
+        read_dpkg_status_file()
 
     # Read MPR cache if we're going to need it.
     if cfg.operation in cfg.requires_mpr_cache:
@@ -66,7 +68,3 @@ def main():
         search()
     elif cfg.operation == "list":
         list_pkg()
-
-    # Close cached files if we opened them.
-    if cfg.dpkg_status_file is not None:
-        cfg.dpkg_status_file.close()

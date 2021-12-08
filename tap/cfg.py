@@ -53,49 +53,61 @@ requires_mpr_cache = ["install", "upgrade", "search", "list"]
 # Information on commands.
 install_options = {"--help": "Bring up this help menu"}
 update_options = {"--help": "Bring up this help menu"}
-upgrade_options = {"--help": "bring up this help menu"}
+upgrade_options = {
+    "--apt-only": "Only consider APT packages for upgrades.",
+    "--help": "bring up this help menu",
+    "--mpr-only": "Only consider MPR packages for upgrades.",
+}
 remove_options = {
     "--help": "Bring up this help menu",
     "--purge": "Remove configuration files for packages upon removal",
 }
 autoremove_options = {"--help": "Bring up this help menu"}
 search_options = {
-    "--help": "Bring up this help menu",
-    "--rev-alpha": "Sort package results from Z-A instead of A-Z",
-    "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
-    "--quiet": "Hide information messages.",
     "--apt-only": "Only show packages available via APT",
+    "--help": "Bring up this help menu",
     "--mpr-only": "Only show packages available in the MPR",
+    "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
     "--pkgname-only": "Only print package names",
+    "--quiet": "Hide information messages.",
+    "--rev-alpha": "Sort package results from Z-A instead of A-Z",
 }
 list_options = {
-    "--help": "Bring up this help menu",
-    "--rev-alpha": "Sort package results from Z-A instead of A-Z",
-    "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
-    "--quiet": "Hide information messages.",
-    "--installed": "Only show installed packages",
-    "--upgradable": "Only show upgradable packages",
     "--apt-only": "Only show packages available via APT",
+    "--help": "Bring up this help menu",
+    "--installed": "Only show installed packages",
+    "--skip-less-pipe": "Don't pipe output into 'less' if output is larger than terminal height",
     "--mpr-only": "Only show packages available in the MPR",
     "--pkgname-only": "Only print package names",
+    "--quiet": "Hide information messages.",
+    "--rev-alpha": "Sort package results from Z-A instead of A-Z",
+    "--upgradable": "Only show upgradable packages",
 }
 
 install_shortopts = {"-h": "--help"}
 update_shortopts = {"-h": "--help"}
-upgrade_shortopts = {"-h": "--help"}
-remove_shortopts = {"-h": "--help"}
+upgrade_shortopts = {"-h": "--help", "-a": "--apt-only", "-m": "--mpr-only"}
+remove_shortopts = {"-h": "--help", "-p": "--purge"}
 autoremove_shortopts = {"-h": "--help"}
 search_shortopts = {
+    "-a": "--apt-only",
+    "-m": "--mpr-only",
+    "-p": "--pkgname-only",
     "-h": "--help",
     "-L": "--skip-less-pipe",
     "-R": "--rev-alpha",
     "-q": "--quiet",
 }
 list_shortopts = {
+    "-a": "--apt-only",
+    "-m": "--mpr-only",
+    "-p": "--pkgname-only",
     "-h": "--help",
     "-L": "--skip-less-pipe",
     "-R": "--rev-alpha",
     "-q": "--quiet",
+    "-i": "--installed",
+    "-u": "--upgradable",
 }
 command_options = {
     "install": (install_options, install_shortopts),
@@ -116,7 +128,7 @@ apt_acquire = None
 apt_sourcelist = None
 apt_pkgrecords = None
 mpr_cache = None
-dpkg_status_file = None
+dpkg_packages = None
 
 # APT exception errors.
 APT_BROKEN_PACKAGES = "E:Unable to correct problems, you have held broken packages."

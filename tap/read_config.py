@@ -4,13 +4,28 @@ from os.path import exists
 from tap import cfg
 from tap.message import message
 
-_required_keys = ["remove", "search"]
+_required_keys = ["upgrade", "remove", "search", "list"]
+_upgrade_keys = ["apt_only", "mpr_only"]
 _remove_keys = ["purge"]
-_search_keys = ["rev_alpha", "skip_less_pipe", "apt_only", "mpr_only"]
-
-_key_maps = {"remove": _remove_keys, "search": _search_keys}
+_search_keys = ["rev_alpha", "skip_less_pipe", "apt_only", "mpr_only", "pkgname_only"]
+_list_keys = [
+    "rev_alpha",
+    "skip_less_pipe",
+    "installed",
+    "upgradable",
+    "apt_only",
+    "mpr_only",
+    "pkgname_only",
+]
+_key_maps = {
+    "upgrade": _upgrade_keys,
+    "remove": _remove_keys,
+    "search": _search_keys,
+    "list": _list_keys,
+}
 
 _default_config = {
+    "upgrade": {"apt_only": 0, "mpr_only": 0},
     "remove": {"purge": 0},
     "search": {
         "rev_alpha": 0,

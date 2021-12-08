@@ -1,7 +1,4 @@
-from tap import cfg
 from tap.message import message
-
-from apt_pkg import CURSTATE_INSTALLED, TagFile
 
 
 def _is_integer(arg):
@@ -10,31 +7,6 @@ def _is_integer(arg):
         return True
     except ValueError:
         return False
-
-
-def is_installed(pkgname):
-    installed = False
-
-    try:
-        if cfg.apt_cache[pkgname].current_state == CURSTATE_INSTALLED:
-            installed = True
-    except KeyError:
-        installed = False
-
-    if not installed:
-        return False
-
-    if cfg.dpkg_status_file is None:
-        cfg.dpkg_status_file = TagFile("/var/lib/dpkg/status")
-
-    with cfg.dpkg_status_file as file:
-        for section in file:
-            if section["Package"] == pkgname:
-                try:
-                    section["MPR-Package"]
-                    return "mpr"
-                except KeyError:
-                    return "apt"
 
 
 def get_user_selection(question, options, **kwargs):
