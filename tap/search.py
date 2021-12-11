@@ -25,6 +25,11 @@ def _get_apt_package_descriptions():
             continue
 
         pkgbase = cfg.apt_depcache.get_candidate_ver(i)
+
+        # 'pkgbase' will be None for any deconfigured packages that don't have any other versions that the deconfigured one available.
+        if pkgbase is None:
+            continue
+
         cfg.apt_pkgrecords.lookup(pkgbase.file_list[0])
         pkgname = i.name
         pkgdesc = cfg.apt_pkgrecords.short_desc
@@ -66,6 +71,11 @@ def _get_description(pkgname):
             return None
 
         cache_version = cfg.apt_depcache.get_candidate_ver(cache_pkg)
+
+        # 'cache_version' will be None for any deconfigured packages that don't have any other versions that the deconfigured one available.
+        if cache_version is None:
+            return None
+
         cfg.apt_pkgrecords.lookup(cache_version.file_list[0])
         return cfg.apt_pkgrecords.short_desc
 
