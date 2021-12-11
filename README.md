@@ -21,7 +21,7 @@ Users of the APT commandline tools will find most options readily available to t
 Several commands have specific options available to them, those can be seen by running `tap *command* --help`.
 
 ## Support
-Issues with using Tap should be made inside of the project's [issue tracker](/hwittenborn/tap/issues).
+Issues with using Tap should be made inside of the project's [issue tracker](https://github.com/hwittenborn/tap/issues).
 
 If a package fails to build with Tap, you should try building the package with makedeb before posting issues to the package maintainer or the makedeb issue tracker, as the issue may be rooted in Tap itself.
 
