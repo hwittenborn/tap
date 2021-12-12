@@ -1,6 +1,8 @@
 # Completions for the `tap` command
 
 set -l all_subcmds install update upgrade remove autoremove search list
+set -l pkg_subcmds install upgrade search  
+set -l installed_pkg_subcmds remove
 
 function __fish_tap_subcommand
     set subcommand $argv[1]
@@ -13,6 +15,9 @@ function __fish_tap_option
     set -e argv[1]
     complete -f -c tap -n "__fish_seen_subcommand_from $subcommand" $argv
 end
+
+complete -c tap -n "__fish_seen_subcommand_from $pkg_subcmds" -a '(__fish_print_packages | head -n 250)'
+complete -c tap -n "__fish_seen_subcommand_from $installed_pkg_subcmds" -a '(__fish_print_packages --installed | string match -re -- "(?:\\b|_)"(commandline -ct | string escape --style=regex) | head -n 250)' -d 'Package'
 
 # Support flags
 complete -x -f -c tap -s h -l help -d 'Display help'
@@ -60,3 +65,5 @@ __fish_tap_option update -s h -l help -d 'Display help'
 # Upgrade
 __fish_tap_subcommand upgrade -r -d 'Upgrade packages'
 __fish_tap_option upgrade -s a -l apt-only -d 'Only consider APT packages for upgrades'
+__fish_tap_option upgrade -s h -l help -d 'Display help'
+__fish_tap_option upgrade -s h -l mpr-only -d 'Only consider MPR packages for upgrades'
