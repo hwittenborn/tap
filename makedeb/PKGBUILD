@@ -1,10 +1,10 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=tap
-pkgver=0.28.10
+pkgver=1.0.0
 pkgrel=1
 pkgdesc="MPR in your pocket"
 arch=('any')
-depends=('python3' 'python3-requests')
+depends=('python3' 'python3-requests' 'python3-apt' 'less')
 optdepends=('r!bash-completion')
 makedepends=('python3-setuptools' 'asciidoctor')
 conflicts=('node-tap')
