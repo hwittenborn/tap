@@ -101,11 +101,6 @@ def _generate_results():
         if ("--pkgname-only" in cfg.options) or (
             cfg.config_data[cfg.operation]["pkgname_only"]
         ):
-            print(
-                "--pkgname-only" in cfg.options,
-                type(cfg.config_data[cfg.operation]["pkgname_only"]),
-            )
-            exit()
             results_string += f"{pkgname}\n"
             continue
 
