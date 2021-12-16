@@ -1,7 +1,7 @@
 from apt.progress.base import AcquireProgress
 from tap import cfg
 from tap.message import message
-
+from time import sleep
 
 class apt_fetch_packages(AcquireProgress):
     def fetch(self, item):

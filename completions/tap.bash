@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 _tap() {
     base_commands=('install' 'update' 'upgrade' 'remove'
-                   'autoremove' 'search')
-
-    accepts_args=('install' 'remove' 'search')
+                   'autoremove' 'search' 'list')
+    uses_pkglist=('install' 'remove' 'search' 'list')
     install_opts=('-h' '--help')
     update_opts=('-h' '--help')
     upgrade_opts=('-h' '--help')
@@ -17,35 +16,41 @@ _tap() {
                '-q' '--quiet' '--pkgname-only' '--installed'
                '--upgradable')
 
-    number_of_args="${#COMP_WORDS[@]}"
-    command="${COMP_WORDS[1]}"
-    cur="${COMP_WORDS[COMP_CWORD]}"
+    tmpfile="$(mktemp)"
+
+    local cur prev words cword
+    _init_completion || return
+    cmd="${words[1]}"
     
-    # Process very first arg.
-    if [[ "${number_of_args}" == "2" ]]; then
-        mapfile -t COMPREPLY < <(printf '%s\n' "${base_commands[@]}" | grep "^${cur}" 2> /dev/null)
+    if [[ "${#words[@]}" == "2" ]]; then
+        mapfile -t COMPREPLY < <(compgen -W '${base_commands[@]}' -- "${cur}")
         return
     fi
 
-    # Process command options (if it's a valid command).
-    valid_command=0
-
-    for i in "${base_commands[@]}"; do
-        if [[ "${command}" == "${i}" ]]; then
-            valid_command=1
-            break
-        fi
-    done
-
-    if ! (( "${valid_command}" )); then
+    if [[ "$(compgen -W '${base_commands[@]}' -- "${cmd}")" == "" ]]; then
         COMPREPLY=()
         return
     fi
-    
-    opts="${command}_opts[@]"
 
-    mapfile -t COMPREPLY < <(printf '%s\n' "${!opts}" | grep "^${cur}" 2> /dev/null)
-    return
+    opts="${cmd}_opts[@]"
+
+    case "${cur}" in
+        -*)
+            mapfile -t COMPREPLY < <(compgen -W '${!opts}' -- "${cur}")
+            return
+            ;;
+        *)
+            if [[ "$(compgen -W '${uses_pkglist[@]}' -- "${cmd}")" == "" ]]; then
+                mapfile -t COMPREPLY < <(compgen -W '${!opts}' -- "${cur}")
+                return
+            fi
+
+            mapfile -t pkglist < /var/cache/tap/pkglist
+            compgen -W '${pkglist[@]}' -- "${cur}" > "${tmpfile}"
+            mapfile -t COMPREPLY < "${tmpfile}"
+            return
+            ;;
+    esac
 }
 
 complete -F _tap tap

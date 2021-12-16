@@ -15,3 +15,5 @@ install:
 	mkdir -p '$(DESTDIR)/var/cache/tap/'
 	touch '$(DESTDIR)/var/cache/tap/mpr-cache.json'
 	chmod 644 '$(DESTDIR)/var/cache/tap/mpr-cache.json'
+	touch '$(DESTDIR)/var/cache/tap/pkglist'
+	chmod 644 '$(DESTDIR)/var/cache/tap/pkglist'
