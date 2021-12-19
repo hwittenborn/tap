@@ -1,4 +1,5 @@
 from tap.message import message
+from tap import cfg
 
 
 def _is_integer(arg):
@@ -7,6 +8,21 @@ def _is_integer(arg):
         return True
     except ValueError:
         return False
+
+
+def is_installed(pkgname):
+    dpkg_pkg = cfg.dpkg_packages.get(pkgname)
+
+    if dpkg_pkg is not None:
+        if dpkg_pkg["Status"] != "install ok installed":
+            return False
+
+        if dpkg_pkg.get("MPR-Package") is not None:
+            return "mpr"
+        else:
+            return "apt"
+
+    return False
 
 
 def get_user_selection(question, options, **kwargs):

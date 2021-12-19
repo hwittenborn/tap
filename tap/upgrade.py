@@ -4,6 +4,7 @@ from tap.get_editor_name import get_editor_name
 from tap.install import _run_pre_transaction
 from tap.run_loading_function import run_loading_function
 from tap.message import message
+from tap.read_config import get_option
 
 from apt_pkg import CURSTATE_INSTALLED
 
@@ -18,18 +19,12 @@ def _upgrade():
         else:
             mpr_package = False
 
-        if (not mpr_package) and (
-            ("--mpr-only" not in cfg.options)
-            and (not cfg.config_data["upgrade"]["mpr_only"])
-        ):
+        if (not mpr_package) and (not get_option("filter", "mpr_only")):
             if cfg.apt_depcache.is_upgradable(i):
                 cfg.apt_depcache.mark_install(i)
                 cfg.apt_resolver.protect(i)
 
-        elif (mpr_package) and (
-            ("--apt-only" not in cfg.options)
-            and (not cfg.config_data["upgrade"]["apt_only"])
-        ):
+        elif (mpr_package) and (not get_option("filter", "apt_only")):
             rpc_data = cfg.mpr_cache.package_dicts[i.name]
             current_pkgver = i.current_ver.ver_str
             latest_pkgver = rpc_data.version

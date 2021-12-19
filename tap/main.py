@@ -2,7 +2,6 @@
 from tap import cfg
 from tap.apt_fetch_packages import apt_fetch_packages
 from tap.arg_check import arg_check
-from tap.autoremove import autoremove
 from tap.install import install
 from tap.list import list_pkg
 from tap.message import message
@@ -17,9 +16,11 @@ from tap.upgrade import upgrade
 from tap.read_dpkg_status_file import read_dpkg_status_file
 
 import apt_pkg
+from tempfile import NamedTemporaryFile
+from traceback import format_exc
 
 
-def main():
+def _main():
     arg_check()
     read_config()
 
@@ -54,17 +55,33 @@ def main():
             cfg.mpr_cache = read_mpr_cache()
 
     # Run commands.
-    if cfg.operation == "install":
-        install()
-    elif cfg.operation == "update":
-        update()
-    elif cfg.operation == "upgrade":
-        upgrade()
-    elif cfg.operation == "remove":
-        remove()
-    elif cfg.operation == "autoremove":
-        autoremove()
-    elif cfg.operation == "search":
-        search()
-    elif cfg.operation == "list":
-        list_pkg()
+    operations = {
+        "install": install,
+        "update": update,
+        "upgrade": upgrade,
+        "remove": remove,
+        "search": search,
+        "list": list_pkg,
+    }
+
+    operations[cfg.operation]()
+
+
+def main():
+    try:
+        _main()
+    except (Exception, KeyboardInterrupt):
+        error = format_exc()
+
+        file = NamedTemporaryFile(prefix="/tmp/tap-", delete=False)
+        file.write(error.encode())
+        file.close()
+
+        print()
+
+        if error.splitlines()[-1] == "KeyboardInterrupt":
+            message.error("Received keyboard interrupt.")
+        else:
+            message.error("Encountered an unknown error.")
+
+        message.error(f"Full traceback at '{file.name}'.")

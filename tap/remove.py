@@ -1,6 +1,7 @@
 from tap import cfg
 from tap.message import message
 from tap.run_transaction import _install_apt_packages
+from tap.read_config import get_option
 
 from apt_pkg import (
     CURSTATE_HALF_CONFIGURED,
@@ -12,6 +13,11 @@ from apt_pkg import (
 
 def remove():
     not_installed = []
+
+    if get_option("remove", "autoremove"):
+        for i in cfg.apt_cache.packages:
+            if cfg.apt_depcache.is_garbage(i):
+                cfg.packages += [i.name]
 
     for i in cfg.packages:
         try:
@@ -26,7 +32,7 @@ def remove():
             CURSTATE_HALF_CONFIGURED,
             CURSTATE_UNPACKED,
         ):
-            if ("--purge" in cfg.options) or (cfg.config_data["remove"]["purge"]):
+            if get_option("remove", "purge"):
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i], True)
             else:
                 cfg.apt_depcache.mark_delete(cfg.apt_cache[i])

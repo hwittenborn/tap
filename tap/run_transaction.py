@@ -12,11 +12,13 @@ from tap.message import message
 from tap.parse_control import parse_control
 from tap.parse_srcinfo import parse_srcinfo
 from tap.review_build_files import review_build_files
+from tap.read_config import get_option
 
 
 def _install_apt_packages(**kwargs):
     show_to_build = kwargs.get("show_to_build", True)
 
+    no_longer_needed = []
     to_apt_install = []
     to_additionally_install = []
     to_upgrade = []
@@ -42,6 +44,9 @@ def _install_apt_packages(**kwargs):
             if i.essential:
                 to_remove_essential += [i.name]
 
+        elif cfg.apt_depcache.is_garbage(i):
+            no_longer_needed += [i.name]
+
     for i in cfg.mpr_packages:
         if cfg.dpkg_packages.get(i) is not None:
             to_upgrade += [i]
@@ -62,6 +67,14 @@ def _install_apt_packages(**kwargs):
         exit(1)
 
     print(colors.bold)
+
+    if no_longer_needed != []:
+        generate_apt_styled_text(
+            "The following packages were automatically installed and are no longer needed:",
+            no_longer_needed,
+        )
+        print("Run 'sudo tap remove --autoremove' to remove them.")
+
     if show_to_build:
         generate_apt_styled_text(
             "The following packages are going to be built:", cfg.mpr_packages
@@ -81,9 +94,13 @@ def _install_apt_packages(**kwargs):
     generate_apt_styled_text(
         "The following packages are going to be DOWNGRADED:", to_downgrade
     )
-    generate_apt_styled_text(
-        "The following packages are going to be REMOVED:", to_remove
-    )
+
+    if get_option("remove", "purge"):
+        msg = "The following packages, as well as their configuration files, are going to be REMOVED:"
+    else:
+        msg = "The following packages are going to be REMOVED:"
+
+    generate_apt_styled_text(msg, to_remove)
 
     len_to_install = len(cfg.mpr_packages + to_apt_install)
     len_to_upgrade = len(to_upgrade)

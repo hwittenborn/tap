@@ -4,46 +4,31 @@ from os.path import exists
 from tap import cfg
 from tap.message import message
 
-_required_keys = ["upgrade", "remove", "search", "list"]
-_upgrade_keys = ["apt_only", "mpr_only"]
-_remove_keys = ["purge"]
-_search_keys = ["rev_alpha", "skip_less_pipe", "apt_only", "mpr_only", "pkgname_only"]
-_list_keys = [
-    "rev_alpha",
-    "skip_less_pipe",
-    "installed",
-    "upgradable",
-    "apt_only",
-    "mpr_only",
-    "pkgname_only",
-]
-_key_maps = {
-    "upgrade": _upgrade_keys,
-    "remove": _remove_keys,
-    "search": _search_keys,
-    "list": _list_keys,
-}
 
-_default_config = {
-    "upgrade": {"apt_only": 0, "mpr_only": 0},
-    "remove": {"purge": 0},
-    "search": {
-        "rev_alpha": 0,
-        "skip_less_pipe": 0,
-        "apt_only": 0,
-        "mpr_only": 0,
-        "pkgname_only": 0,
-    },
-    "list": {
-        "rev_alpha": 0,
-        "skip_less_pipe": 0,
-        "installed": 0,
-        "upgradable": 0,
-        "apt_only": 0,
-        "mpr_only": 0,
-        "pkgname_only": 0,
-    },
-}
+def get_config_item(section, key, **kwargs):
+    config_item = cfg.config_data.get(section)
+
+    if config_item is not None:
+        config_item = config_item.get(key)
+
+    try:
+        if int(config_item) == 1:
+            return True
+        return False
+    except (ValueError, TypeError):
+        return False
+
+
+def get_option(section, key):
+    cli_arg = "--" + key.replace("_", "-")
+
+    if cli_arg in cfg.options:
+        return True
+
+    if get_config_item(section, key):
+        return True
+
+    return False
 
 
 def read_config():
@@ -54,8 +39,7 @@ def read_config():
             message.warning(
                 "Couldn't find config file, falling back to default values."
             )
-
-        cfg.config_data = _default_config
+        cfg.config_data = {}
         return
 
     config.read(cfg.config_file)
@@ -70,44 +54,3 @@ def read_config():
         config_dict[item] = current_dict
 
     cfg.config_data = config_dict
-
-    # Validate config.
-    bad_config_reasons = []
-
-    for item in _required_keys:
-        if item not in config_dict:
-            msg = message.warning2(
-                f"Missing toplevel item '{item}'.", value_return=True
-            )
-            bad_config_reasons += [msg]
-            cfg.config_data[item] = _default_config[item]
-
-    for item in _required_keys:
-        for key in _key_maps[item]:
-            if key not in config_dict[item]:
-                msg = message.warning2(
-                    f"Missing key '{key}' under toplevel item '{item}'.",
-                    value_return=True,
-                )
-                bad_config_reasons += [msg]
-                cfg.config_data[item][key] = _default_config[item][key]
-
-            else:
-                try:
-                    cfg.config_data[item][key] = int(cfg.config_data[item][key])
-                    assert cfg.config_data[item][key] in (0, 1)
-
-                except (ValueError, AssertionError):
-                    msg = message.warning2(
-                        f"Invalid value for '{key}' under toplevel item '{item}'.",
-                        value_return=True,
-                    )
-                    bad_config_reasons += [msg]
-                    cfg.config_data[item][key] = _default_config[item][key]
-
-    if (bad_config_reasons != []) and ("--quiet" not in cfg.options):
-        message.warning("Config file is invalid:")
-        for i in bad_config_reasons:
-            print(i, end="")
-
-        message.warning("Falling back to default values for invalid items.")

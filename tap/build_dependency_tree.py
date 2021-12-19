@@ -70,13 +70,8 @@ def _build_dependency_tree(**kwargs):
                 value_return=True,
             )
             raise newline_error_exception(msg)
-
         else:
-            msg = message.error(
-                "An unknown error was encountered with building the dependency tree.",
-                value_return=True,
-            )
-            raise newline_error_exception(msg)
+            raise e
 
 
 def build_dependency_tree(*args, **kwargs):

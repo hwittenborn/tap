@@ -8,6 +8,7 @@ from tap.message import message
 from tap.run_loading_function import run_loading_function
 from tap.list import _list_all_packages
 from tap.read_mpr_cache import read_mpr_cache
+from tap.upgrade import _upgrade
 
 
 def _update_apt():
@@ -62,4 +63,12 @@ def update():
     )
     run_loading_function(msg, _update_cache_files)
 
+    _upgrade()
+
+    upgradeable = len(cfg.apt_packages + cfg.mpr_packages)
+
+    if upgradeable > 0:
+        message.info(
+            f"{upgradeable} packages can be upgraded. Run 'tap list --upgradable' to see them."
+        )
     exit(0)

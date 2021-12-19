@@ -31,20 +31,18 @@ available_commands = {
     "update": "Update local repository caches",
     "upgrade": "Upgrade installed packages",
     "remove": "Remove installed packages",
-    "autoremove": "Remove any unneeded packages",
     "search": "Search for packages",
     "list": "List installed packages",
 }
 
-requires_arguments = ["install", "remove", "search"]
-optional_arguments = ["list"]
-requires_sudo = ["install", "update", "upgrade", "remove", "autoremove"]
+requires_arguments = ["install", "search"]
+optional_arguments = ["list", "remove"]
+requires_sudo = ["install", "update", "upgrade", "remove"]
 requires_apt_cache = [
     "install",
     "update",
     "upgrade",
     "remove",
-    "autoremove",
     "search",
     "list",
 ]
@@ -59,10 +57,10 @@ upgrade_options = {
     "--mpr-only": "Only consider MPR packages for upgrades.",
 }
 remove_options = {
+    "--autoremove": "Automatically remove unneded packages",
     "--help": "Bring up this help menu",
     "--purge": "Remove configuration files for packages upon removal",
 }
-autoremove_options = {"--help": "Bring up this help menu"}
 search_options = {
     "--apt-only": "Only show packages available via APT",
     "--help": "Bring up this help menu",
@@ -87,8 +85,7 @@ list_options = {
 install_shortopts = {"-h": "--help"}
 update_shortopts = {"-h": "--help"}
 upgrade_shortopts = {"-h": "--help", "-a": "--apt-only", "-m": "--mpr-only"}
-remove_shortopts = {"-h": "--help", "-p": "--purge"}
-autoremove_shortopts = {"-h": "--help"}
+remove_shortopts = {"-h": "--help", "-p": "--purge", "-W": "--autoremove"}
 search_shortopts = {
     "-a": "--apt-only",
     "-m": "--mpr-only",
@@ -114,7 +111,6 @@ command_options = {
     "update": (update_options, update_shortopts),
     "upgrade": (upgrade_options, upgrade_shortopts),
     "remove": (remove_options, remove_shortopts),
-    "autoremove": (autoremove_options, autoremove_shortopts),
     "search": (search_options, search_shortopts),
     "list": (list_options, list_shortopts),
 }

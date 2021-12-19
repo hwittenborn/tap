@@ -10,11 +10,21 @@ def _print_formatted_args(args):
         if string_length > total_length:
             total_length = string_length
 
+    result_string = []
+
     for i in args:
         extra_spaces = " " * (total_length - len(i))
         item_description = args[i]
 
-        print(f"  {i}{extra_spaces}  {item_description}")
+        result_string += [f"  {i}{extra_spaces}  {item_description}\n"]
+
+    result_string = sorted(result_string, key=str.casefold)
+
+    print("".join(result_string), end="")
+    exit()
+
+    result_string.sort()
+    print("".join(result_string), end="")
 
 
 def help_menu(**args):
