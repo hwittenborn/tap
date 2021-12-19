@@ -1,53 +1,53 @@
 #!/usr/bin/env bash
-_tap() {
-    base_commands=('install' 'update' 'upgrade' 'remove'
-                   'autoremove' 'search' 'list')
-    uses_pkglist=('install' 'remove' 'search' 'list')
-    install_opts=('-h' '--help')
-    update_opts=('-h' '--help')
-    upgrade_opts=('-h' '--help')
-    remove_opts=('-h' '--help' '--purge')
-    autoremove_opts=('-h' '--help')
-    search_opts=('-h' '--help' '-R' '--rev-alpha'
-                 '-L' '--skip-less-pipe' '--apt-only' '--mpr-only'
-                 '-q' '--quiet' '--pkgname-only')
-    list_opts=('-h' '--help' '-R' '--rev-alpha'
-               '-L' '--skip-less-pipe' '--apt-only' '--mpr-only'
-               '-q' '--quiet' '--pkgname-only' '--installed'
-               '--upgradable')
+_gen_compreply() {
+    mapfile -t COMPREPLY < <(compgen -W "${1}" -- "${2}")
+}
 
+_pkglist_compreply() {
     tmpfile="$(mktemp)"
+    mapfile -t pkglist < /var/cache/tap/pkglist
+    compgen -W '${pkglist[@]}' -- "${cur}" > "${tmpfile}"
+    mapfile -t COMPREPLY < "${tmpfile}"
+}
+
+_tap() {
+    commands=('install' 'update' 'upgrade' 'remove' 'search' 'list')
+    help_opts=('--help')
+    upgrade_opts=('--apt-only' '--mpr-only')
+    remove_opts=('--purge' '--autoremove')
+    search_opts=('--rev-alpha' '--skip-less-pipe' '--apt-only' '--mpr-only' '--quiet' '--pkgname-only')
+    list_opts=("${search_opts[@]}" '--installed' '--upgradable')
 
     local cur prev words cword
     _init_completion || return
     cmd="${words[1]}"
-    
-    if [[ "${#words[@]}" == "2" ]]; then
-        mapfile -t COMPREPLY < <(compgen -W '${base_commands[@]}' -- "${cur}")
-        return
-    fi
 
-    if [[ "$(compgen -W '${base_commands[@]}' -- "${cmd}")" == "" ]]; then
-        COMPREPLY=()
-        return
-    fi
+    case "${cmd}" in
+        install|remove|list)
+            case "${cur}" in
+                -*)
+                    cmd_opts="${cmd}_opts[@]"
+                    opts=("${!cmd_opts}" "${help_opts[@]}")
+                    _gen_compreply '${opts[@]}' "${cur}"
+                    return
+                    ;;
 
-    opts="${cmd}_opts[@]"
+                *)
+                    _pkglist_compreply
+                    return
+                    ;;
+            esac
+            ;;
 
-    case "${cur}" in
-        -*)
-            mapfile -t COMPREPLY < <(compgen -W '${!opts}' -- "${cur}")
+        update|upgrade|search)
+            cmd_opts="${cmd}_opts[@]"
+            opts=("${!cmd_opts}" "${help_opts[@]}")
+            _gen_compreply '${opts[@]}' "${cur}"
             return
             ;;
-        *)
-            if [[ "$(compgen -W '${uses_pkglist[@]}' -- "${cmd}")" == "" ]]; then
-                mapfile -t COMPREPLY < <(compgen -W '${!opts}' -- "${cur}")
-                return
-            fi
 
-            mapfile -t pkglist < /var/cache/tap/pkglist
-            compgen -W '${pkglist[@]}' -- "${cur}" > "${tmpfile}"
-            mapfile -t COMPREPLY < "${tmpfile}"
+        *)
+            _gen_compreply '${commands[@]}' "${cmd}"
             return
             ;;
     esac
