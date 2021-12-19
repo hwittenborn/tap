@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+set -e
+needed_files=('/var/cache/tap/mpr-cache.json' '/var/cache/tap/pkglist')
+
+for i in "${needed_files[@]}"; do
+    dirname="$(dirname "${i}")"
+
+    if ! [[ -d "${dirname}" ]]; then
+        mkdir -p "${dirname}"
+    fi
+
+    if ! [[ -f "${i}" ]]; then
+        touch "${i}"
+    fi
+done
