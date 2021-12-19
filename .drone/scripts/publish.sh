@@ -26,19 +26,19 @@ find ./ \
      -maxdepth 1 \
      -not -path './' \
      -not -path './.git' \
-     -exec rm '{}' -rf \;
+     -exec rm '{}' -rfv \;
 
 cd ../makedeb/
 find ./ \
     -maxdepth 1 \
-    -exec cp '{}' '../tap-mpr/{}' -R \;
+    -exec cp '{}' '../tap-mpr/{}' -Rv \;
 
 cd ../tap-mpr/
 makedeb --printsrcinfo | tee .SRCINFO
 
 package_version="$(cat .SRCINFO | grep 'pkgver' | awk -F ' = ' '{print $2}')"
 package_relationship="$(cat .SRCINFO | grep 'pkgrel' | awk -F ' = ' '{print $2}')"
-git add PKGBUILD .SRCINFO
+git add ./
 git commit -m "Updated version to ${package_version}-${package_relationship}"
 
 git push
