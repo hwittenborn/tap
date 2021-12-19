@@ -161,8 +161,8 @@ def _print_results():
 
 def search():
     # Get list of package descriptions for packages in APT cache.
-    if get_option("filter", "mpr_only"):
-        if get_option("output", "quiet"):
+    if not get_option("filter", "mpr_only"):
+        if not get_option("output", "quiet"):
             msg = message.info(
                 "Reading package descriptions...",
                 newline=False,
