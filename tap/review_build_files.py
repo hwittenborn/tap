@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from os import chdir
 from subprocess import PIPE
@@ -58,6 +59,6 @@ def review_build_files():
                     message.error(
                         f"Command '{cfg.editor_name} -- {file}' didn't finish succesfully."
                     )
-                    exit(0)
+                    sys.exit(0)
 
             sleep(0.5)

@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from os import environ
 
@@ -13,7 +14,7 @@ def root_check():
             "Tap needs to run under sudo(8) in order to modify packages on your system."
         )
         message.error("Please run Tap under sudo(8) and try again.")
-        exit(1)
+        sys.exit(1)
 
     command = subprocess.run(
         ["sudo", "-nu", f"#{sudo_uid}", "true"],
@@ -23,6 +24,6 @@ def root_check():
 
     if command.returncode != 0:
         message.error(f"Couldn't obtain permissions to run under UID '{sudo_uid}'.")
-        exit(1)
+        sys.exit(1)
 
     cfg.build_user = sudo_uid

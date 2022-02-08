@@ -1,6 +1,7 @@
+import sys
 import json
-
 import requests
+
 from tap import cfg
 from tap.apt_fetch_packages import apt_fetch_packages
 from tap.exceptions import newline_error_exception
@@ -71,4 +72,4 @@ def update():
         message.info(
             f"{upgradeable} packages can be upgraded. Run 'tap list --upgradable' to see them."
         )
-    exit(0)
+    sys.exit(0)

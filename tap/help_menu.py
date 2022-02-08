@@ -1,3 +1,4 @@
+import sys
 from tap import cfg
 
 
@@ -21,7 +22,7 @@ def _print_formatted_args(args):
     result_string = sorted(result_string, key=str.casefold)
 
     print("".join(result_string), end="")
-    exit()
+    sys.exit()
 
     result_string.sort()
     print("".join(result_string), end="")
@@ -71,4 +72,4 @@ def help_menu(**args):
     )
 
     if args.get("exit", True):
-        exit(0)
+        sys.exit(0)

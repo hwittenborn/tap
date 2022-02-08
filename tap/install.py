@@ -1,3 +1,4 @@
+import sys
 from os import chdir, makedirs, mkdir
 from os.path import exists
 from shutil import rmtree
@@ -37,7 +38,7 @@ def _run_pre_transaction():
                 message.error(
                     f"Please check '{build_dir}', and delete it yourself if you know it is safe to do so."
                 )
-                exit(1)
+                sys.exit(1)
 
             msg = message.info(
                 "Removing old build directory...",
@@ -58,7 +59,7 @@ def _run_pre_transaction():
             message.error(
                 f"Make sure the parent directories of '{build_dir}' are writable and try again."
             )
-            exit(1)
+            sys.exit(1)
 
         # Clone packages.
         chdir(build_dir)
@@ -126,6 +127,6 @@ def install():
         message.error("Couldn't find the following packages:")
         for i in missing_packages:
             message.error2(i)
-        exit(1)
+        sys.exit(1)
 
     _run_pre_transaction()

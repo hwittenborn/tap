@@ -1,3 +1,4 @@
+import sys
 from tap import cfg
 from tap.exceptions import newline_error_exception
 from tap.message import message
@@ -59,7 +60,7 @@ def parse_srcinfo(path):
             value = " = ".join(args[1:])
         except IndexError:
             message.error("Error parsing SRCINFO file under '{path}'.")
-            exit(1)
+            sys.exit(1)
 
         try:
             current_dict[key] += [value]
@@ -89,7 +90,7 @@ def parse_srcinfo(path):
             bad_file = True
 
     if bad_file:
-        exit(1)
+        sys.exit(1)
 
     # Parse distro dependencies properly.
     for dependency in [

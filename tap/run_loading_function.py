@@ -1,3 +1,4 @@
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -21,4 +22,4 @@ def run_loading_function(message, function, *args, **kwargs):
     except tap.exceptions.newline_error_exception as e:
         msg = e.args[0].strip()
         print(msg)
-        exit(1)
+        sys.exit(1)

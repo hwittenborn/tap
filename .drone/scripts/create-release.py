@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+import sys
 from os import environ
 from github import Github
 from github.GithubException import BadCredentialsException
@@ -29,14 +31,14 @@ for i in [[pkgver, "pkgver"], [pkgrel, "pkgrel"]]:
         missing_var = True
 
 if missing_var:
-    exit(1)
+    sys.exit(1)
 
 pkgver = pkgver.lstrip("\tpkgver = ")
 pkgrel = pkgrel.lstrip("\tpkgrel = ")
 
 if github_api_key is None:
     print("ERROR: Environment variable 'github_api_key' isn't set.")
-    exit(1)
+    sys.exit(1)
 
 client = Github(github_api_key)
 
@@ -44,7 +46,7 @@ try:
     client.get_user().name
 except BadCredentialsException:
     print("ERROR: Invalid credentials provided.")
-    exit(1)
+    sys.exit(1)
 
 # Create the release.
 tag = f"v{pkgver}-{pkgrel}"

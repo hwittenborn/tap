@@ -1,5 +1,5 @@
 import re
-from sys import argv
+import sys
 
 from tap import cfg
 from tap.help_menu import help_menu
@@ -22,7 +22,7 @@ def _split_args(args):
 def arg_check():
     options = []
 
-    for i in _split_args(argv[1:]):
+    for i in _split_args(sys.argv[1:]):
         if re.match("^[a-z0-9][a-z0-9-]*$", i) is not None:
             if cfg.operation is None:
                 cfg.operation = i
@@ -44,7 +44,7 @@ def arg_check():
     elif cfg.operation not in cfg.available_commands:
         message.error(f"Invalid command '{cfg.operation}'.")
         message.error(f"See '{cfg.application_name} --help' for available commands.")
-        exit(1)
+        sys.exit(1)
 
     # Process sub-command arguments.
     opts = cfg.command_options[cfg.operation]
@@ -65,7 +65,7 @@ def arg_check():
         message.error(
             f"See '{cfg.application_name} {cfg.operation} --help' for available options."
         )
-        exit(1)
+        sys.exit(1)
 
     for i in ("-h", "--help"):
         if i in cfg.options:
@@ -74,11 +74,11 @@ def arg_check():
     # Check if a command recieved argument when it was/wasn't supposed to.
     if (cfg.operation in cfg.requires_arguments) and (cfg.packages == []):
         message.error(f"Command '{cfg.operation}' requires arguments.")
-        exit(1)
+        sys.exit(1)
     elif (
         (cfg.operation not in cfg.requires_arguments)
         and (cfg.operation not in cfg.optional_arguments)
         and (cfg.packages != [])
     ):
         message.error(f"Command '{cfg.operation}' doesn't take arguments.")
-        exit(1)
+        sys.exit(1)

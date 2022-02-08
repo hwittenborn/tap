@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from os import chdir
 from shutil import copy2
@@ -64,7 +65,7 @@ def _install_apt_packages(**kwargs):
         )
         for i in to_remove_essential:
             message.error2(i)
-        exit(1)
+        sys.exit(1)
 
     print(colors.bold)
 
@@ -113,7 +114,7 @@ def _install_apt_packages(**kwargs):
     print(f"{colors.normal}", end="")
 
     if (len_to_install + len_to_upgrade + len_to_downgrade + len_to_remove) == 0:
-        exit(0)
+        sys.exit(0)
 
     print()
     msg = message.question(
@@ -122,7 +123,7 @@ def _install_apt_packages(**kwargs):
     response = input(msg).lower()
 
     if response not in ("", "y"):
-        exit(1)
+        sys.exit(1)
 
     # Prompt the user to review build files.
     if show_to_build:
@@ -153,7 +154,7 @@ def _install_apt_packages(**kwargs):
 
         if result == cfg.apt_pkgman.RESULT_FAILED:
             message.error("Failed installing packages.")
-            exit(1)
+            sys.exit(1)
 
 
 def run_transaction():
@@ -218,7 +219,7 @@ def run_transaction():
 
                 if response != "n":
                     message.error("Aborting...")
-                    exit(1)
+                    sys.exit(1)
 
                 else:
                     message.info("Continuing with builds...")
