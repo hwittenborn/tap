@@ -1,5 +1,6 @@
 # Credits to @vyashole (GitHub) for the idea to implement this.
 # See 'https://github.com/hwittenborn/tap/issues/2' for more info.
+import sys
 from tap import cfg
 
 
@@ -25,6 +26,6 @@ def get_editor_name():
 
     if which(editor_name) is None:
         message("error", f"Couldn't find editor '{editor_name}'.")
-        quit(1)
+        sys.exit(1)
 
     cfg.editor_name = editor_name
