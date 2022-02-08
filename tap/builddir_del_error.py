@@ -6,4 +6,3 @@ def builddir_del_error(i, path, j):
 
     msg = message.error(f"Path '{path}' was unable to be deleted.", value_return=True)
     raise newline_error_exception(msg)
-    exit(1)
