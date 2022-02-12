@@ -14,11 +14,12 @@ tap - MPR in your pocket
 *sudo tap autoremove*
 *sudo tap update*
 *sudo tap upgrade*
+*tap list*
 
 == CONFIGURATION
-*Tap* contains a configuration file at _/etc/tap.cfg_ which is modelled after the options for each command.
+*Tap* contains a configuration file at _/etc/tap.cfg_ which is modeled after the options for each command.
 
-Items should generally be self-explanable after viewing the options under the help menu for each command (which are viewable via *tap* _command_ *--help*).
+Items should generally be self-explainable after viewing the options under the help menu for each command (which are viewable via *tap* _command_ *--help*).
 
 == DESCRIPTION
 *Tap* is a feature-rich MPR helper that aims to be a drop-in replacement for *APT*(8). *Tap* provides access to almost every command accessible by *apt*, with MPR functionality integrated directly into said commands.
@@ -34,7 +35,7 @@ Removes the specified packages from the system.
 If removing any of the specified packages would cause an essential (*dpkg*(1)) package to be removed, *Tap* aborts the transaction.
 
 *search* _query params_ ...::
-Searches the AUR and MPR for each of the specified query parameters.
+Searches APT and the MPR for each of the specified query parameters.
 
 *autoremove*::
 Removes any packages that are no longer needed by a package on the system.
@@ -44,6 +45,9 @@ Updates the APT and MPR repository caches on the local system.
 
 *upgrade*::
 Checks if any installed packages have upgrades available for installation.
+
+*list*::
+Lists all APT and MPR packages.
 
 == BUGS
 Issues, as well as feature requests, should be posted on the project's GitHub page: ::
