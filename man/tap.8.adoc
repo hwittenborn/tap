@@ -11,7 +11,6 @@ tap - MPR in your pocket
 *sudo tap install* [_package_]
 *sudo tap remove* [_package_]
 *tap search* _search-query_
-*sudo tap autoremove*
 *sudo tap update*
 *sudo tap upgrade*
 *tap list*
@@ -36,9 +35,6 @@ If removing any of the specified packages would cause an essential (*dpkg*(1)) p
 
 *search* _query params_ ...::
 Searches APT and the MPR for each of the specified query parameters.
-
-*autoremove*::
-Removes any packages that are no longer needed by a package on the system.
 
 *update*::
 Updates the APT and MPR repository caches on the local system.
