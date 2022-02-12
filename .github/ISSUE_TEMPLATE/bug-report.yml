@@ -1,0 +1,16 @@
+name: Bug report
+description: Issues with using Tap, installing packages, resolving dependencies, etc.
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Issue
+      placeholder: Type a complete description of your issue
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Tap version
+      description: Can be found by running `apt policy tap`
+    validations:
+      required: true

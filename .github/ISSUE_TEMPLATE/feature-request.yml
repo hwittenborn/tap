@@ -1,0 +1,15 @@
+name: Feature request
+description: Request a new feature
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Description of feature
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Tap version
+      description: Can be found by running `apt policy tap`
+    validations:
+      required: true
