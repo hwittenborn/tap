@@ -1,5 +1,6 @@
 # Tap
 ![build status](https://img.shields.io/drone/build/hwittenborn/tap/main?logo=drone&server=https%3A%2F%2Fdrone.hunterwittenborn.com)
+[![Matrix Room](https://img.shields.io/matrix/tap:hunterwittenborn.com?logo=matrix&server_fqdn=matrix.hunterwittenborn.com)](https://matrix.to/#/#tap:hunterwittenborn.com)
 
 ## Overview
 Tap is a feature-rich MPR helper that aims to be a drop-in replacement for APT. Tap provides access to almost every command accessible by `apt`, with MPR functionality integrated directly into said commands.
