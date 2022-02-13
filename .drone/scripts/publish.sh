@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -ex
-mpr_fingerprint='SHA256:TQtnFwjBwpDOHnHTaANeudpXVmomlYo6Td/8T51FA/w'
+mpr_fingerprint='SHA256:7Wki/ZTENAVOYmAtH4+vhqZB8vHkLURS+eK1SQy0jTs'
 
 # SSH configuration
 rm -rf "${HOME}/.ssh/" || true
