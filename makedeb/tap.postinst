@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -e
 needed_files=('/var/cache/tap/mpr-cache.json' '/var/cache/tap/pkglist')
 
