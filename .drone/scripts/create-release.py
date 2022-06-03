@@ -13,9 +13,9 @@ with open(".SRCINFO") as file:
     pkgrel = None
 
     for i in file.read().splitlines():
-        if i.startswith("\tpkgver"):
+        if i.startswith("pkgver"):
             pkgver = i
-        elif i.startswith("\tpkgrel"):
+        elif i.startswith("pkgrel"):
             pkgrel = i
 
 missing_var = False
