@@ -1,3 +1,10 @@
+# *THIS REPOSITORY IS ARCHIVED*
+I no longer plan on working on Tap. I've been busy working on other aspects of the makedeb ecosystem, and it's just taking too much time away from this to do anything meaningful on it.
+
+If you still want to use an MPR helper, I'd suggest taking a look at the [MPR helpers](https://docs.makedeb.org/using-the-mpr/list-of-mpr-helpers/) page in the makedeb Docs.
+
+makedeb also has an [official MPR CLI](https://github.com/makedeb/mpr-cli) that provides some of the functionality Tap currently has, though any sort of functionality related to package management is notably missing at the moment.
+
 # Tap
 ![build status](https://img.shields.io/drone/build/hwittenborn/tap/main?logo=drone&server=https%3A%2F%2Fdrone.hunterwittenborn.com)
 [![Matrix Room](https://img.shields.io/matrix/tap:hunterwittenborn.com?logo=matrix&server_fqdn=matrix.hunterwittenborn.com)](https://matrix.to/#/#tap:hunterwittenborn.com)
